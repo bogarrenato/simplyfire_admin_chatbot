@@ -50,7 +50,7 @@ const AppPieChart = () => {
   
   return (
     <div className="">
-      <h1 className="text-lg font-medium mb-6">Browser Usage</h1>
+      <h1 className="text-lg font-medium mb-6">Böngészők használata</h1>
       <ChartContainer
         config={chartConfig}
         className="mx-auto aspect-square max-h-[250px]"
@@ -100,12 +100,12 @@ const AppPieChart = () => {
         </PieChart>
       </ChartContainer>
       <div className="mt-4 flex flex-col gap-2 items-center">
-        <div className="flex items-center gap-2 font-medium leading-none">
+        {/* <div className="flex items-center gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4 text-green-500" />
-        </div>
-        <div className="leading-none text-muted-foreground">
+        </div> */}
+        {/* <div className="leading-none text-muted-foreground">
           Showing total visitors for the last 6 months
-        </div>
+        </div> */}
       </div>
     </div>
   );

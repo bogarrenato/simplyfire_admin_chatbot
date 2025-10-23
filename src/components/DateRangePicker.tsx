@@ -47,7 +47,7 @@ export default function DateRangePicker({ onDateRangeChange, className }: DateRa
     } else if (startDate) {
       return format(startDate, "MMM dd, yyyy", { locale: hu });
     }
-    return "Dátum intervallum kiválasztása";
+    return "Idő kiválasztása";
   };
 
   return (
@@ -56,7 +56,7 @@ export default function DateRangePicker({ onDateRangeChange, className }: DateRa
         <Button
           variant="outline"
           className={cn(
-            "w-[280px] justify-start text-left font-normal",
+            "w-full max-w-[280px] justify-start text-left font-normal text-sm",
             !startDate && "text-muted-foreground",
             className
           )}
@@ -65,16 +65,17 @@ export default function DateRangePicker({ onDateRangeChange, className }: DateRa
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-4">
-          <div className="space-y-4">
+      <PopoverContent className="w-auto p-0 max-w-[95vw] sm:max-w-[400px]" align="start" side="bottom">
+        <div className="p-3">
+          <div className="space-y-3">
             <div>
               <h4 className="font-medium text-sm mb-2">Kezdő dátum kiválasztása</h4>
               <Calendar
                 mode="single"
                 selected={startDate}
                 onSelect={handleDateSelect}
-                className="rounded-md border"
+                className="rounded-md border w-full"
+                locale={hu}
               />
             </div>
             {startDate && (
@@ -84,16 +85,17 @@ export default function DateRangePicker({ onDateRangeChange, className }: DateRa
                   mode="single"
                   selected={endDate}
                   onSelect={handleDateSelect}
-                  className="rounded-md border"
+                  className="rounded-md border w-full"
                   disabled={(date) => date < startDate}
+                  locale={hu}
                 />
               </div>
             )}
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsOpen(false)}>
+            <div className="flex justify-end space-x-2 pt-2">
+              <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>
                 Mégse
               </Button>
-              <Button onClick={handleApply} disabled={!startDate || !endDate}>
+              <Button size="sm" onClick={handleApply} disabled={!startDate || !endDate}>
                 Alkalmaz
               </Button>
             </div>

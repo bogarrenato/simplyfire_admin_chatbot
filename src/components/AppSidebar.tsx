@@ -53,21 +53,21 @@ const items = [
     url: "/messages",
     icon: Inbox,
   },
-  {
-    title: "Naptár",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Keresés",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Beállítások",
-    url: "#",
-    icon: Settings,
-  },
+  // {
+  //   title: "Naptár",
+  //   url: "#",
+  //   icon: Calendar,
+  // },
+  // {
+  //   title: "Keresés",
+  //   url: "#",
+  //   icon: Search,
+  // },
+  // {
+  //   title: "Beállítások",
+  //   url: "#",
+  //   icon: Settings,
+  // },
 ];
 
 const AppSidebar = () => {
@@ -107,7 +107,7 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Projektek</SidebarGroupLabel>
           <SidebarGroupAction>
             <Plus /> <span className="sr-only">Projekt hozzáadása</span>
@@ -132,9 +132,9 @@ const AppSidebar = () => {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
         {/* COLLAPSABLE */}
-        <Collapsible defaultOpen className="group/collapsible">
+        {/* <Collapsible defaultOpen className="group/collapsible">
           <SidebarGroup>
             <SidebarGroupLabel asChild>
               <CollapsibleTrigger>
@@ -165,9 +165,9 @@ const AppSidebar = () => {
               </SidebarGroupContent>
             </CollapsibleContent>
           </SidebarGroup>
-        </Collapsible>
+        </Collapsible> */}
         {/* NESTED */}
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Beágyazott elemek</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -199,7 +199,7 @@ const AppSidebar = () => {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

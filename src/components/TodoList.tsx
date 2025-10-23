@@ -8,6 +8,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { hu } from "date-fns/locale";
 import { Calendar } from "./ui/calendar";
 
 const TodoList = () => {
@@ -20,10 +21,10 @@ const TodoList = () => {
         <PopoverTrigger asChild>
           <Button className="w-full">
             <CalendarIcon />
-            {date ? format(date, "PPP") : <span>Pick a date</span>}
+            {date ? format(date, "PPP", { locale: hu }) : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-auto">
+        <PopoverContent className="p-0 w-auto max-w-[95vw] sm:max-w-[350px]" align="start" side="bottom">
           <Calendar
             mode="single"
             selected={date}
@@ -31,6 +32,7 @@ const TodoList = () => {
               setDate(date);
               setOpen(false);
             }}
+            locale={hu}
           />
         </PopoverContent>
       </Popover>
