@@ -16,7 +16,7 @@ import {
   generateRevenueStats,
   type ChartData,
 } from "@/lib/data-generator";
-import { format, subDays } from "date-fns";
+import { subDays } from "date-fns";
 
 const chartConfig = {
   questions: {
@@ -27,14 +27,22 @@ const chartConfig = {
 
 const AppBarChart = () => {
   const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<{
+    totalQuestions: number;
+    avgQuestions: number;
+    peakDay: string;
+    peakQuestions: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState<Date>(new Date());
 
   useEffect(() => {
     generateData(startDate, endDate);
-  }, []);
+  }, [
+    startDate,
+    endDate,
+  ]);
 
   const generateData = async (start: Date, end: Date) => {
     setLoading(true);

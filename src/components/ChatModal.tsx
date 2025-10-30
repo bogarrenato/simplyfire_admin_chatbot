@@ -1,10 +1,9 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { X, User, Bot, Clock, MessageSquare } from "lucide-react";
+import {  User, Bot, Clock, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 
@@ -75,10 +74,63 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
     }
   };
 
+  // Render helpers: support basic markdown links [text](url) and bare URL linkification
+  const createAnchor = (href: string, text: string) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline text-primary hover:opacity-80"
+    >
+      {text}
+    </a>
+  );
+
+  const linkifyUrls = (text: string): Array<string | React.ReactElement> => {
+    const urlRegex = /https?:\/\/[^\s)]+/g;
+    const parts: Array<string | React.ReactElement> = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = urlRegex.exec(text)) !== null) {
+      const url = match[0];
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      parts.push(createAnchor(url, url));
+      lastIndex = match.index + url.length;
+    }
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+    return parts as Array<string | React.ReactElement>;
+  };
+
+  const renderMessageContent = (text: string): Array<string | React.ReactElement> => {
+    const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+    const nodes: Array<string | React.ReactElement> = [] as Array<string | React.ReactElement>;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = mdLinkRegex.exec(text)) !== null) {
+      const preceding = text.slice(lastIndex, match.index);
+      if (preceding) {
+        nodes.push(...(linkifyUrls(preceding) as Array<string | React.ReactElement>));
+      }
+      const label = match[1];
+      const url = match[2];
+      nodes.push(createAnchor(url, label));
+      lastIndex = mdLinkRegex.lastIndex;
+    }
+    const tail = text.slice(lastIndex);
+    if (tail) {
+      nodes.push(...(linkifyUrls(tail) as Array<string | React.ReactElement>));
+    }
+    return nodes;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+        <DialogHeader className="shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <DialogTitle className="text-xl font-bold mb-2">
@@ -126,7 +178,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                   }`}
                 >
                   <div className="flex items-start space-x-2">
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       {message.sender === "user" ? (
                         <User className="h-5 w-5 text-primary-foreground" />
                       ) : (
@@ -143,7 +195,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                         </span>
                       </div>
                       <div className="whitespace-pre-wrap text-sm">
-                        {message.content}
+                        {renderMessageContent(message.content)}
                       </div>
                     </div>
                   </div>
@@ -153,7 +205,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
           </div>
         </ScrollArea>
 
-        <div className="flex-shrink-0 mt-4 pt-4 border-t">
+        <div className="shrink-0 mt-4 pt-4 border-t">
           <div className="flex items-center justify-center text-sm text-muted-foreground">
             <div className="flex items-center space-x-4">
               <span>

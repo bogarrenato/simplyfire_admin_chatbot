@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MessageSquare, Clock, User, Bot } from "lucide-react";
+import { MessageSquare, Clock, User } from "lucide-react";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import ChatModal from "./ChatModal";
@@ -29,135 +28,179 @@ interface Conversation {
 const mockConversations: Conversation[] = [
   {
     id: "1",
-    title: "Segítség a React komponensekkel",
+    title: "Online jegyvásárlás és kedvezmények",
     messages: [
       {
         id: "1-1",
-        content: "Szia! Segítenél nekem a React komponensek létrehozásában?",
+        content: "Hogyan tudok online jegyet venni az Aqua-Palace Élményfürdőbe?",
         sender: "user",
-        timestamp: new Date("2024-01-15T10:30:00")
+        timestamp: new Date("2025-10-29T10:10:00")
       },
       {
         id: "1-2",
-        content: "Természetesen! Örülök, hogy segíthetek a React komponensek létrehozásában. Milyen típusú komponenst szeretnél létrehozni?",
+        content: "Az online jegyvásárlás elérhető a Hungarospa oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
         sender: "bot",
-        timestamp: new Date("2024-01-15T10:30:15")
+        timestamp: new Date("2025-10-29T10:10:20")
       },
-      {
-        id: "1-3",
-        content: "Egy egyszerű gomb komponenst szeretnék, ami különböző színekben jelenhet meg.",
-        sender: "user",
-        timestamp: new Date("2024-01-15T10:31:00")
-      },
-      {
-        id: "1-4",
-        content: "Remek! Íme egy példa egy egyszerű gomb komponensre TypeScript-sel:\n\n```tsx\ninterface ButtonProps {\n  children: React.ReactNode;\n  variant?: 'primary' | 'secondary';\n  onClick?: () => void;\n}\n\nexport const Button: React.FC<ButtonProps> = ({ \n  children, \n  variant = 'primary', \n  onClick \n}) => {\n  return (\n    <button \n      className={`px-4 py-2 rounded ${\n        variant === 'primary' \n          ? 'bg-blue-500 text-white' \n          : 'bg-gray-500 text-white'\n      }`}\n      onClick={onClick}\n    >\n      {children}\n    </button>\n  );\n};\n```",
-        sender: "bot",
-        timestamp: new Date("2024-01-15T10:31:30")
-      }
     ],
-    createdAt: new Date("2024-01-15T10:30:00"),
-    lastMessageAt: new Date("2024-01-15T10:31:30"),
-    messageCount: 4,
+    createdAt: new Date("2025-10-29T10:10:00"),
+    lastMessageAt: new Date("2025-10-29T10:10:20"),
+    messageCount: 2,
     status: "completed"
   },
   {
     id: "2",
-    title: "CSS Grid layout problémák",
+    title: "Árak és belépőjegy csomagok",
     messages: [
       {
         id: "2-1",
-        content: "Nem tudom, hogyan kell beállítani a CSS Grid-et, hogy 3 oszlopban jelenjenek meg az elemek.",
+        content: "Mennyibe kerül a családi jegy?",
         sender: "user",
-        timestamp: new Date("2024-01-14T14:20:00")
+        timestamp: new Date("2025-10-29T11:00:00")
       },
       {
         id: "2-2",
-        content: "A CSS Grid nagyszerű választás! Íme egy egyszerű példa 3 oszlopos elrendezésre:\n\n```css\n.grid-container {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 1rem;\n}\n```\n\nEz létrehoz egy 3 oszlopos rácsot, ahol minden oszlop egyenlő szélességű (1fr), és 1rem távolság van közöttük.",
+        content: "A konkrét árak a Hungarospa Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
         sender: "bot",
-        timestamp: new Date("2024-01-14T14:20:30")
+        timestamp: new Date("2025-10-29T11:00:20")
       },
       {
         id: "2-3",
-        content: "Köszönöm! És hogyan tudom beállítani, hogy mobil nézeten csak 1 oszlop legyen?",
+        content: "Van kombinált jegy Aqua-Palace + Gyógyfürdőre?",
         sender: "user",
-        timestamp: new Date("2024-01-14T14:21:00")
+        timestamp: new Date("2025-10-29T11:00:40")
       },
       {
         id: "2-4",
-        content: "Erre a CSS media query-ket használhatod:\n\n```css\n.grid-container {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 1rem;\n}\n\n@media (max-width: 768px) {\n  .grid-container {\n    grid-template-columns: 1fr;\n  }\n}\n```\n\nEz azt jelenti, hogy 768px alatt csak 1 oszlop lesz látható.",
+        content: "Igen, elérhető Aqua-Palace extra belépőjegy csomag, amely kedvezményes kombinációt kínál. Részletek az árak oldalon: [ÁRAK](https://hungarospa.hu/jegyarak/)",
         sender: "bot",
-        timestamp: new Date("2024-01-14T14:21:30")
+        timestamp: new Date("2025-10-29T11:01:00")
       }
     ],
-    createdAt: new Date("2024-01-14T14:20:00"),
-    lastMessageAt: new Date("2024-01-14T14:21:30"),
+    createdAt: new Date("2025-10-29T11:00:00"),
+    lastMessageAt: new Date("2025-10-29T11:01:00"),
     messageCount: 4,
     status: "completed"
   },
   {
     id: "3",
-    title: "JavaScript async/await használata",
+    title: "Nyitvatartás és szezonális egységek",
     messages: [
       {
         id: "3-1",
-        content: "Mi a különbség a Promise és az async/await között?",
+        content: "Nyitva van most az Aquapark?",
         sender: "user",
-        timestamp: new Date("2024-01-13T09:15:00")
+        timestamp: new Date("2025-10-29T12:15:00")
       },
       {
         id: "3-2",
-        content: "A Promise és az async/await ugyanazt a célt szolgálják, de az async/await szintaktikailag egyszerűbb. Íme egy összehasonlítás:\n\n**Promise használata:**\n```javascript\nfetch('/api/data')\n  .then(response => response.json())\n  .then(data => console.log(data))\n  .catch(error => console.error(error));\n```\n\n**async/await használata:**\n```javascript\nasync function fetchData() {\n  try {\n    const response = await fetch('/api/data');\n    const data = await response.json();\n    console.log(data);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```",
+        content: "Az Aquapark jelenleg zárva. Egész évben nyitva: Aqua-Palace Élményfürdő, Gyógyfürdő, Árpád Uszoda. A Strand szezonálisan üzemel. Aktuális nyitvatartás: https://hungarospa.hu/",
         sender: "bot",
-        timestamp: new Date("2024-01-13T09:15:30")
+        timestamp: new Date("2025-10-29T12:15:20")
       }
     ],
-    createdAt: new Date("2024-01-13T09:15:00"),
-    lastMessageAt: new Date("2024-01-13T09:15:30"),
+    createdAt: new Date("2025-10-29T12:15:00"),
+    lastMessageAt: new Date("2025-10-29T12:15:20"),
     messageCount: 2,
     status: "completed"
   },
   {
     id: "4",
-    title: "TypeScript interface vs type",
+    title: "Fizetési módok és kedvezmények",
     messages: [
       {
         id: "4-1",
-        content: "Mikor használjam az interface-t és mikor a type-ot TypeScript-ben?",
+        content: "Milyen fizetési módokat fogadnak el a pénztáraknál?",
         sender: "user",
-        timestamp: new Date("2024-01-12T16:45:00")
+        timestamp: new Date("2025-10-29T13:05:00")
       },
       {
         id: "4-2",
-        content: "Jó kérdés! Általában ezeket a szabályokat követem:\n\n**Interface-t használj:**\n- Objektumok típusainak definiálásához\n- Amikor kiterjeszteni szeretnéd a típust\n- API-k és komponens props-okhoz\n\n**Type-ot használj:**\n- Union típusokhoz (string | number)\n- Primitív típusok aliasaihoz\n- Komplex típus kombinációkhoz\n\nPélda:\n```typescript\n// Interface - objektumokhoz\ninterface User {\n  id: number;\n  name: string;\n}\n\n// Type - union típusokhoz\ntype Status = 'loading' | 'success' | 'error';\n```",
+        content: "A részletes információk a Fizetési módok menüpontban találhatók. Itt tájékozódhat a készpénz, bankkártya és egyéb elfogadott fizetési megoldásokról.",
         sender: "bot",
-        timestamp: new Date("2024-01-12T16:45:30")
+        timestamp: new Date("2025-10-29T13:05:20")
+      },
+      {
+        id: "4-3",
+        content: "Vannak szezonális akciók vagy kedvezmények?",
+        sender: "user",
+        timestamp: new Date("2025-10-29T13:05:40")
+      },
+      {
+        id: "4-4",
+        content: "Igen, az Akciók oldalon rendszeresen frissülő ajánlatok érhetők el (például online jegyvásárlási kedvezmény, kombinált csomagok). Részletek: https://hungarospa.hu/",
+        sender: "bot",
+        timestamp: new Date("2025-10-29T13:05:55")
       }
     ],
-    createdAt: new Date("2024-01-12T16:45:00"),
-    lastMessageAt: new Date("2024-01-12T16:45:30"),
-    messageCount: 2,
+    createdAt: new Date("2025-10-29T13:05:00"),
+    lastMessageAt: new Date("2025-10-29T13:05:55"),
+    messageCount: 4,
     status: "completed"
   },
   {
     id: "5",
-    title: "Next.js routing kérdések",
+    title: "Hungarospa Medical Center – labor akció",
     messages: [
       {
         id: "5-1",
-        content: "Hogyan kell beállítani a dinamikus routing-ot Next.js-ben?",
+        content: "Van most kedvezmény a laborvizsgálatokra a Medical Centerben?",
         sender: "user",
-        timestamp: new Date("2024-01-11T11:30:00")
+        timestamp: new Date("2025-10-30T09:00:00")
       },
       {
         id: "5-2",
-        content: "A Next.js dinamikus routing-ja nagyon egyszerű! Íme a lépések:\n\n1. **Fájl struktúra:** Hozz létre egy `[id].tsx` fájlt a `pages` vagy `app` mappában\n\n2. **App Router (Next.js 13+):**\n```typescript\n// app/posts/[id]/page.tsx\nexport default function Post({ params }: { params: { id: string } }) {\n  return <div>Post ID: {params.id}</div>;\n}\n```\n\n3. **Pages Router:**\n```typescript\n// pages/posts/[id].tsx\nexport default function Post({ query }: { query: { id: string } }) {\n  return <div>Post ID: {query.id}</div>;\n}\n```",
+        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a Hungarospa Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
         sender: "bot",
-        timestamp: new Date("2024-01-11T11:30:30")
+        timestamp: new Date("2025-10-30T09:00:25")
       }
     ],
-    createdAt: new Date("2024-01-11T11:30:00"),
-    lastMessageAt: new Date("2024-01-11T11:30:30"),
+    createdAt: new Date("2025-10-30T09:00:00"),
+    lastMessageAt: new Date("2025-10-30T09:00:25"),
+    messageCount: 2,
+    status: "completed"
+  },
+  {
+    id: "6",
+    title: "Gyógykúra és szolgáltatások",
+    messages: [
+      {
+        id: "6-1",
+        content: "Mit tartalmaz a Gyógykúra élményfürdőzéssel akció?",
+        sender: "user",
+        timestamp: new Date("2025-10-30T09:20:00")
+      },
+      {
+        id: "6-2",
+        content: "A Hajdúszoboszlói Gyógyfürdő gyógykúra szolgáltatásai mellé az akció időtartama alatt élményfürdő belépő jár. A részletes feltételek és időtartam az Akciók oldalon található: https://hungarospa.hu/",
+        sender: "bot",
+        timestamp: new Date("2025-10-30T09:20:25")
+      }
+    ],
+    createdAt: new Date("2025-10-30T09:20:00"),
+    lastMessageAt: new Date("2025-10-30T09:20:25"),
+    messageCount: 2,
+    status: "completed"
+  },
+  {
+    id: "7",
+    title: "Parkolás és megközelítés",
+    messages: [
+      {
+        id: "7-1",
+        content: "Hol tudok parkolni és hogyan lehet a komplexumot megközelíteni?",
+        sender: "user",
+        timestamp: new Date("2025-10-30T09:40:00")
+      },
+      {
+        id: "7-2",
+        content: "A Parkolás és Megközelítés információk a honlapon találhatók, térképekkel és gyakorlati tudnivalókkal. Kérjük, ellenőrizze az aktuális részleteket indulás előtt: https://hungarospa.hu/",
+        sender: "bot",
+        timestamp: new Date("2025-10-30T09:40:20")
+      }
+    ],
+    createdAt: new Date("2025-10-30T09:40:00"),
+    lastMessageAt: new Date("2025-10-30T09:40:20"),
     messageCount: 2,
     status: "completed"
   }

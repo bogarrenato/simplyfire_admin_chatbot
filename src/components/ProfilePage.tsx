@@ -23,8 +23,8 @@ interface UserProfile {
 
 const mockProfile: UserProfile = {
   id: "user_123",
-  name: "John Doe",
-  email: "john.doe@simplyfire.ai",
+  name: "Hungarospa",
+  email: "contact@hungarospa.hu",
   avatar: "/api/placeholder/150/150",
   bankAccount: "1234567890123456",
   joinDate: new Date("2023-01-15"),
@@ -162,7 +162,7 @@ const ProfilePage = () => {
         </Card>
 
         {/* Bankszámla adatok */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <CreditCard className="h-5 w-5" />
@@ -182,7 +182,7 @@ const ProfilePage = () => {
               </p>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Biztonsági beállítások */}
         <Card>

@@ -1,4 +1,4 @@
-import { format, eachDayOfInterval, subDays, addDays } from "date-fns";
+import { format, eachDayOfInterval } from "date-fns";
 import { hu } from "date-fns/locale";
 
 export interface RevenueData {

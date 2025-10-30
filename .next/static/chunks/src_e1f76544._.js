@@ -1136,7 +1136,10 @@ const AppBarChart = ()=>{
         "AppBarChart.useEffect": ()=>{
             generateData(startDate, endDate);
         }
-    }["AppBarChart.useEffect"], []);
+    }["AppBarChart.useEffect"], [
+        startDate,
+        endDate
+    ]);
     const generateData = async (start, end)=>{
         setLoading(true);
         // Simulate API call delay
@@ -1186,7 +1189,7 @@ const AppBarChart = ()=>{
                         children: "Kérdezések száma"
                     }, void 0, false, {
                         fileName: "[project]/src/components/AppBarChart.tsx",
-                        lineNumber: 73,
+                        lineNumber: 81,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1202,31 +1205,31 @@ const AppBarChart = ()=>{
                                         children: range.label
                                     }, range.days, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 77,
+                                        lineNumber: 85,
                                         columnNumber: 15
                                     }, this)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$DateRangePicker$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     onDateRangeChange: handleDateRangeChange
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 87,
+                                    lineNumber: 95,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AppBarChart.tsx",
-                            lineNumber: 75,
+                            lineNumber: 83,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/AppBarChart.tsx",
-                        lineNumber: 74,
+                        lineNumber: 82,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/AppBarChart.tsx",
-                lineNumber: 72,
+                lineNumber: 80,
                 columnNumber: 7
             }, this),
             loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1235,12 +1238,12 @@ const AppBarChart = ()=>{
                     className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary"
                 }, void 0, false, {
                     fileName: "[project]/src/components/AppBarChart.tsx",
-                    lineNumber: 94,
+                    lineNumber: 102,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/AppBarChart.tsx",
-                lineNumber: 93,
+                lineNumber: 101,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                 children: [
@@ -1255,7 +1258,7 @@ const AppBarChart = ()=>{
                                         children: stats.totalQuestions.toLocaleString()
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 101,
+                                        lineNumber: 109,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1263,13 +1266,13 @@ const AppBarChart = ()=>{
                                         children: "Összes kérdés"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 104,
+                                        lineNumber: 112,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AppBarChart.tsx",
-                                lineNumber: 100,
+                                lineNumber: 108,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1280,7 +1283,7 @@ const AppBarChart = ()=>{
                                         children: stats.avgQuestions.toLocaleString()
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 107,
+                                        lineNumber: 115,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1288,13 +1291,13 @@ const AppBarChart = ()=>{
                                         children: "Átlagos kérdések"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 110,
+                                        lineNumber: 118,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AppBarChart.tsx",
-                                lineNumber: 106,
+                                lineNumber: 114,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1305,7 +1308,7 @@ const AppBarChart = ()=>{
                                         children: stats.peakQuestions.toLocaleString()
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 115,
+                                        lineNumber: 123,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1317,19 +1320,19 @@ const AppBarChart = ()=>{
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 118,
+                                        lineNumber: 126,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AppBarChart.tsx",
-                                lineNumber: 114,
+                                lineNumber: 122,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/AppBarChart.tsx",
-                        lineNumber: 99,
+                        lineNumber: 107,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$chart$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChartContainer"], {
@@ -1343,7 +1346,7 @@ const AppBarChart = ()=>{
                                     vertical: false
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 127,
+                                    lineNumber: 135,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$recharts$2f$es6$2f$cartesian$2f$XAxis$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["XAxis"], {
@@ -1354,7 +1357,7 @@ const AppBarChart = ()=>{
                                     tickFormatter: (value)=>value
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 128,
+                                    lineNumber: 136,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$recharts$2f$es6$2f$cartesian$2f$YAxis$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["YAxis"], {
@@ -1363,29 +1366,29 @@ const AppBarChart = ()=>{
                                     axisLine: false
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 135,
+                                    lineNumber: 143,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$chart$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChartTooltip"], {
                                     content: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$chart$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChartTooltipContent"], {}, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 136,
+                                        lineNumber: 144,
                                         columnNumber: 38
                                     }, void 0)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 136,
+                                    lineNumber: 144,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$chart$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChartLegend"], {
                                     content: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$chart$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChartLegendContent"], {}, void 0, false, {
                                         fileName: "[project]/src/components/AppBarChart.tsx",
-                                        lineNumber: 137,
+                                        lineNumber: 145,
                                         columnNumber: 37
                                     }, void 0)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 137,
+                                    lineNumber: 145,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$recharts$2f$es6$2f$cartesian$2f$Bar$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Bar"], {
@@ -1394,18 +1397,18 @@ const AppBarChart = ()=>{
                                     radius: 4
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AppBarChart.tsx",
-                                    lineNumber: 138,
+                                    lineNumber: 146,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AppBarChart.tsx",
-                            lineNumber: 126,
+                            lineNumber: 134,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/AppBarChart.tsx",
-                        lineNumber: 125,
+                        lineNumber: 133,
                         columnNumber: 11
                     }, this)
                 ]
@@ -1413,7 +1416,7 @@ const AppBarChart = ()=>{
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/AppBarChart.tsx",
-        lineNumber: 71,
+        lineNumber: 79,
         columnNumber: 5
     }, this);
 };
@@ -1506,7 +1509,7 @@ const AppPieChart = ()=>{
                 children: "Böngészők használata"
             }, void 0, false, {
                 fileName: "[project]/src/components/AppPieChart.tsx",
-                lineNumber: 53,
+                lineNumber: 52,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$chart$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChartContainer"], {
@@ -1520,12 +1523,12 @@ const AppPieChart = ()=>{
                                 hideLabel: true
                             }, void 0, false, {
                                 fileName: "[project]/src/components/AppPieChart.tsx",
-                                lineNumber: 61,
+                                lineNumber: 60,
                                 columnNumber: 22
                             }, void 0)
                         }, void 0, false, {
                             fileName: "[project]/src/components/AppPieChart.tsx",
-                            lineNumber: 59,
+                            lineNumber: 58,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$recharts$2f$es6$2f$polar$2f$Pie$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Pie"], {
@@ -1550,7 +1553,7 @@ const AppPieChart = ()=>{
                                                     children: totalVisitors.toLocaleString()
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AppPieChart.tsx",
-                                                    lineNumber: 80,
+                                                    lineNumber: 79,
                                                     columnNumber: 23
                                                 }, void 0),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tspan", {
@@ -1560,49 +1563,49 @@ const AppPieChart = ()=>{
                                                     children: "Visitors"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AppPieChart.tsx",
-                                                    lineNumber: 87,
+                                                    lineNumber: 86,
                                                     columnNumber: 23
                                                 }, void 0)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AppPieChart.tsx",
-                                            lineNumber: 74,
+                                            lineNumber: 73,
                                             columnNumber: 21
                                         }, void 0);
                                     }
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/AppPieChart.tsx",
-                                lineNumber: 70,
+                                lineNumber: 69,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/AppPieChart.tsx",
-                            lineNumber: 63,
+                            lineNumber: 62,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AppPieChart.tsx",
-                    lineNumber: 58,
+                    lineNumber: 57,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/AppPieChart.tsx",
-                lineNumber: 54,
+                lineNumber: 53,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "mt-4 flex flex-col gap-2 items-center"
             }, void 0, false, {
                 fileName: "[project]/src/components/AppPieChart.tsx",
-                lineNumber: 102,
+                lineNumber: 101,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/AppPieChart.tsx",
-        lineNumber: 52,
+        lineNumber: 51,
         columnNumber: 5
     }, this);
 };

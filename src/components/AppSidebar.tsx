@@ -1,21 +1,17 @@
 import {
   Home,
   Inbox,
-  Calendar,
-  Search,
-  Settings,
+
   User2,
   ChevronUp,
-  Plus,
-  Projector,
-  ChevronDown,
+
 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
+
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -23,9 +19,7 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
+
   SidebarSeparator,
 } from "./ui/sidebar";
 import Link from "next/link";
@@ -36,11 +30,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "./ui/collapsible";
 
 const items = [
   {
@@ -78,8 +67,8 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <Image src="/simplyfire.png" alt="logo" width={20} height={20} />
-                <span>SimplyFire.ai admin oldal</span>
+                <Image src="/hungarospa.png" alt="logo" width={20} height={20} />
+                <span>Hungarospa admin oldal</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -207,7 +196,7 @@ const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> John Doe <ChevronUp className="ml-auto" />
+                  <User2 /> Hungarospa <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
