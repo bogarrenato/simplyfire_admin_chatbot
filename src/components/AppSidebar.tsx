@@ -33,12 +33,12 @@ import {
 
 const items = [
   {
-    title: "Főoldal",
+    title: "Homepage",
     url: "/",
     icon: Home,
   },
   {
-    title: "Üzenetek",
+    title: "Messages",
     url: "/messages",
     icon: Inbox,
   },
@@ -67,8 +67,8 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <Image src="/hungarospa.png" alt="logo" width={20} height={20} />
-                <span>Hungarospa admin oldal</span>
+                <Image src="/fessh.png" alt="logo" width={80} height={80} />
+                <span>FESSH admin page</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -77,7 +77,7 @@ const AppSidebar = () => {
       <SidebarSeparator />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Alkalmazás</SidebarGroupLabel>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -88,7 +88,7 @@ const AppSidebar = () => {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
-                  {item.title === "Üzenetek" && (
+                  {item.title === "Messages" && (
                     <SidebarMenuBadge>24</SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
@@ -196,14 +196,14 @@ const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Hungarospa <ChevronUp className="ml-auto" />
+                  <User2 /> FESSH <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">Profilom</Link>
+                  <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>Kijelentkezés</DropdownMenuItem>
+                <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

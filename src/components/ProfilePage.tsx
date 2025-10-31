@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Mail, CreditCard, Calendar, Shield, Edit } from "lucide-react";
+import { User, Mail, Calendar, Shield, Edit } from "lucide-react";
 import { format } from "date-fns";
-import { hu } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 interface UserProfile {
   id: string;
@@ -23,8 +23,8 @@ interface UserProfile {
 
 const mockProfile: UserProfile = {
   id: "user_123",
-  name: "Hungarospa",
-  email: "contact@hungarospa.hu",
+  name: "FESSH",
+  email: "office@fessh.com",
   avatar: "/api/placeholder/150/150",
   bankAccount: "1234567890123456",
   joinDate: new Date("2023-01-15"),
@@ -49,11 +49,11 @@ const ProfilePage = () => {
     loadProfile();
   }, []);
 
-  const maskBankAccount = (account: string) => {
-    const lastFour = account.slice(-4);
-    const masked = "*".repeat(account.length - 4);
-    return `${masked}${lastFour}`;
-  };
+  // const maskBankAccount = (account: string) => {
+  //   const lastFour = account.slice(-4);
+  //   const masked = "*".repeat(account.length - 4);
+  //   return `${masked}${lastFour}`;
+  // };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -71,13 +71,13 @@ const ProfilePage = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "active":
-        return "Aktív";
+        return "Active";
       case "inactive":
-        return "Inaktív";
+        return "Inactive";
       case "suspended":
-        return "Felfüggesztett";
+        return "Suspended";
       default:
-        return "Ismeretlen";
+        return "Unknown";
     }
   };
 
@@ -88,7 +88,7 @@ const ProfilePage = () => {
   if (!profile) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Nem sikerült betölteni a profil adatokat.</p>
+        <p className="text-muted-foreground">Failed to load profile data.</p>
       </div>
     );
   }
@@ -96,20 +96,20 @@ const ProfilePage = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Profil</h1>
+        <h1 className="text-3xl font-bold">Profile</h1>
         <Button variant="outline" size="sm">
           <Edit className="h-4 w-4 mr-2" />
-          Szerkesztés
+          Edit
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Profil kártya */}
+        {/* Profile card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <User className="h-5 w-5" />
-              <span>Alapinformációk</span>
+              <span>Basic information</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -131,12 +131,12 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        {/* Kapcsolattartási adatok */}
+        {/* Contact information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Mail className="h-5 w-5" />
-              <span>Kapcsolattartási adatok</span>
+              <span>Contact information</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -148,13 +148,13 @@ const ProfilePage = () => {
               <div className="flex items-center space-x-3">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  Csatlakozás: {format(profile.joinDate, "yyyy. MMMM dd.", { locale: hu })}
+                  Joined: {format(profile.joinDate, "MMM dd, yyyy", { locale: enUS })}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  Utolsó bejelentkezés: {format(profile.lastLogin, "yyyy. MMMM dd. HH:mm", { locale: hu })}
+                  Last login: {format(profile.lastLogin, "MMM dd, yyyy HH:mm", { locale: enUS })}
                 </span>
               </div>
             </div>
@@ -184,32 +184,32 @@ const ProfilePage = () => {
           </CardContent>
         </Card> */}
 
-        {/* Biztonsági beállítások */}
+        {/* Security settings */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Shield className="h-5 w-5" />
-              <span>Biztonsági beállítások</span>
+              <span>Security settings</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Kétfaktoros hitelesítés</span>
+                <span className="text-sm">Two-factor authentication</span>
                 <Badge variant="outline" className="text-green-600 border-green-600">
-                  Aktív
+                  Active
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Email értesítések</span>
+                <span className="text-sm">Email notifications</span>
                 <Badge variant="outline" className="text-green-600 border-green-600">
-                  Bekapcsolva
+                  Enabled
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">SMS értesítések</span>
+                <span className="text-sm">SMS notifications</span>
                 <Badge variant="outline" className="text-gray-600 border-gray-600">
-                  Kikapcsolva
+                  Disabled
                 </Badge>
               </div>
             </div>

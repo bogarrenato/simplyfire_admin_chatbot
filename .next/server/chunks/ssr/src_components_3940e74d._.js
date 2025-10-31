@@ -230,8 +230,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$
 ;
 const mockProfile = {
     id: "user_123",
-    name: "Hungarospa",
-    email: "contact@hungarospa.hu",
+    name: "FESSH",
+    email: "office@fessh.com",
     avatar: "/api/placeholder/150/150",
     bankAccount: "1234567890123456",
     joinDate: new Date("2023-01-15"),

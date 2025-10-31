@@ -20,7 +20,7 @@ import { subDays } from "date-fns";
 
 const chartConfig = {
   questions: {
-    label: "Kérdezések",
+    label: "Questions",
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
@@ -63,10 +63,10 @@ const AppBarChart = () => {
   };
 
   const quickRanges = [
-    { label: "Elmúlt 7 nap", days: 7 },
-    { label: "Elmúlt 30 nap", days: 30 },
-    { label: "Elmúlt 90 nap", days: 90 },
-    { label: "Elmúlt év", days: 365 },
+    { label: "Last 7 days", days: 7 },
+    { label: "Last 30 days", days: 30 },
+    { label: "Last 90 days", days: 90 },
+    { label: "Last year", days: 365 },
   ];
 
   const handleQuickRange = (days: number) => {
@@ -78,7 +78,7 @@ const AppBarChart = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap">
-        <h1 className="text-lg font-medium">Kérdezések száma</h1>
+        <h1 className="text-lg font-medium">Questions count</h1>
         <div className="flex items-center space-x-2">
           <div className="flex space-x-1 flex-wrap gap-2">
             {quickRanges.map((range) => (
@@ -109,23 +109,19 @@ const AppBarChart = () => {
                 <p className="text-2xl font-bold text-primary">
                   {stats.totalQuestions.toLocaleString()}
                 </p>
-                <p className="text-sm text-muted-foreground">Összes kérdés</p>
+                <p className="text-sm text-muted-foreground">Total questions</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">
                   {stats.avgQuestions.toLocaleString()}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Átlagos kérdések
-                </p>
+                <p className="text-sm text-muted-foreground">Average questions</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">
                   {stats.peakQuestions.toLocaleString()}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Csúcs nap ({stats.peakDay})
-                </p>
+                <p className="text-sm text-muted-foreground">Peak day ({stats.peakDay})</p>
               </div>
             </div>
           )}

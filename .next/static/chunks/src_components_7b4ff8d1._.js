@@ -265,8 +265,8 @@ var _s = __turbopack_context__.k.signature();
 ;
 const mockProfile = {
     id: "user_123",
-    name: "Hungarospa",
-    email: "contact@hungarospa.hu",
+    name: "FESSH",
+    email: "office@fessh.com",
     avatar: "/api/placeholder/150/150",
     bankAccount: "1234567890123456",
     joinDate: new Date("2023-01-15"),

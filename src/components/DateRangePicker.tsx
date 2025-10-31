@@ -47,7 +47,7 @@ export default function DateRangePicker({ onDateRangeChange, className }: DateRa
     } else if (startDate) {
       return format(startDate, "MMM dd, yyyy", { locale: hu });
     }
-    return "Idő kiválasztása";
+    return "Choose interval";
   };
 
   return (

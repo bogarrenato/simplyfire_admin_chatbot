@@ -1,9 +1,14 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import {  User, Bot, Clock, MessageSquare } from "lucide-react";
+import { User, Bot, Clock, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 
@@ -36,7 +41,9 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
   useEffect(() => {
     // Scroll to bottom when modal opens
     if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
@@ -64,13 +71,13 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "active":
-        return "Aktív";
+        return "Active";
       case "completed":
-        return "Befejezett";
+        return "Finished";
       case "archived":
-        return "Archivált";
+        return "Archived";
       default:
-        return "Ismeretlen";
+        return "Unknown";
     }
   };
 
@@ -105,15 +112,21 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
     return parts as Array<string | React.ReactElement>;
   };
 
-  const renderMessageContent = (text: string): Array<string | React.ReactElement> => {
+  const renderMessageContent = (
+    text: string
+  ): Array<string | React.ReactElement> => {
     const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
-    const nodes: Array<string | React.ReactElement> = [] as Array<string | React.ReactElement>;
+    const nodes: Array<string | React.ReactElement> = [] as Array<
+      string | React.ReactElement
+    >;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
     while ((match = mdLinkRegex.exec(text)) !== null) {
       const preceding = text.slice(lastIndex, match.index);
       if (preceding) {
-        nodes.push(...(linkifyUrls(preceding) as Array<string | React.ReactElement>));
+        nodes.push(
+          ...(linkifyUrls(preceding) as Array<string | React.ReactElement>)
+        );
       }
       const label = match[1];
       const url = match[2];
@@ -140,12 +153,14 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
                   <span>
-                    {format(conversation.createdAt, "MMM dd, yyyy HH:mm", { locale: hu })}
+                    {format(conversation.createdAt, "MMM dd, yyyy HH:mm", {
+                      locale: hu,
+                    })}
                   </span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <MessageSquare className="h-4 w-4" />
-                  <span>{conversation.messageCount} üzenet</span>
+                  <span>{conversation.messageCount} messages</span>
                 </div>
                 <Badge className={getStatusColor(conversation.status)}>
                   {getStatusText(conversation.status)}
@@ -168,7 +183,9 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
             {conversation.messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex ${
+                  message.sender === "user" ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
                   className={`max-w-[80%] rounded-lg p-4 ${
@@ -188,7 +205,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <span className="text-sm font-medium">
-                          {message.sender === "user" ? "Felhasználó" : "Chatbot"}
+                          {message.sender === "user" ? "User" : "Chatbot"}
                         </span>
                         <span className="text-xs opacity-70">
                           {format(message.timestamp, "HH:mm", { locale: hu })}
@@ -209,10 +226,16 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
           <div className="flex items-center justify-center text-sm text-muted-foreground">
             <div className="flex items-center space-x-4">
               <span>
-                Beszélgetés kezdete: {format(conversation.createdAt, "MMM dd, yyyy HH:mm", { locale: hu })}
+                Beggining of the conversation:{" "}
+                {format(conversation.createdAt, "MMM dd, yyyy HH:mm", {
+                  locale: hu,
+                })}
               </span>
               <span>
-                Utolsó üzenet: {format(conversation.lastMessageAt, "MMM dd, yyyy HH:mm", { locale: hu })}
+                Last message:{" "}
+                {format(conversation.lastMessageAt, "MMM dd, yyyy HH:mm", {
+                  locale: hu,
+                })}
               </span>
             </div>
           </div>

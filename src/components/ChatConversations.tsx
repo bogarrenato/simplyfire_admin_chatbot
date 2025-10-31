@@ -28,179 +28,177 @@ interface Conversation {
 const mockConversations: Conversation[] = [
   {
     id: "1",
-    title: "Online jegyvásárlás és kedvezmények",
+    title: "EBHS Diploma Examination – requirements & registration",
     messages: [
       {
         id: "1-1",
-        content: "Hogyan tudok online jegyet venni az Aqua-Palace Élményfürdőbe?",
+        content: "What are the requirements for the EBHS Diploma Examination and how can I register?",
         sender: "user",
-        timestamp: new Date("2025-10-29T10:10:00")
+        timestamp: new Date("2025-10-31T09:00:00")
       },
       {
         id: "1-2",
-        content: "Az online jegyvásárlás elérhető a Hungarospa oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
+        content: "The EBHS Diploma Examination information, including eligibility and registration steps, is available under Education → EBHS Diploma Examination. See details here: [EBHS Exam](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-29T10:10:20")
-      },
+        timestamp: new Date("2025-10-31T09:00:20")
+      }
     ],
-    createdAt: new Date("2025-10-29T10:10:00"),
-    lastMessageAt: new Date("2025-10-29T10:10:20"),
+    createdAt: new Date("2025-10-31T09:00:00"),
+    lastMessageAt: new Date("2025-10-31T09:00:20"),
     messageCount: 2,
     status: "completed"
   },
   {
     id: "2",
-    title: "Árak és belépőjegy csomagok",
+    title: "FESSH Academy – Foundation vs Advanced course",
     messages: [
       {
         id: "2-1",
-        content: "Mennyibe kerül a családi jegy?",
+        content: "What is the difference between the Foundation and Advanced Academy courses?",
         sender: "user",
-        timestamp: new Date("2025-10-29T11:00:00")
+        timestamp: new Date("2025-10-31T09:15:00")
       },
       {
         id: "2-2",
-        content: "A konkrét árak a Hungarospa Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
+        content: "Both are part of the FESSH Academy. The Foundation Course focuses on core principles, while the Advanced Course is designed for deeper, specialized topics. Check schedules and content under Education → FESSH Academy courses: [FESSH Academy](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-29T11:00:20")
-      },
-      {
-        id: "2-3",
-        content: "Van kombinált jegy Aqua-Palace + Gyógyfürdőre?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T11:00:40")
-      },
-      {
-        id: "2-4",
-        content: "Igen, elérhető Aqua-Palace extra belépőjegy csomag, amely kedvezményes kombinációt kínál. Részletek az árak oldalon: [ÁRAK](https://hungarospa.hu/jegyarak/)",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T11:01:00")
+        timestamp: new Date("2025-10-31T09:15:25")
       }
     ],
-    createdAt: new Date("2025-10-29T11:00:00"),
-    lastMessageAt: new Date("2025-10-29T11:01:00"),
-    messageCount: 4,
+    createdAt: new Date("2025-10-31T09:15:00"),
+    lastMessageAt: new Date("2025-10-31T09:15:25"),
+    messageCount: 2,
     status: "completed"
   },
   {
     id: "3",
-    title: "Nyitvatartás és szezonális egységek",
+    title: "Online Self-Assessment Examination",
     messages: [
       {
         id: "3-1",
-        content: "Nyitva van most az Aquapark?",
+        content: "Is there an online self-assessment exam I can take?",
         sender: "user",
-        timestamp: new Date("2025-10-29T12:15:00")
+        timestamp: new Date("2025-10-31T09:30:00")
       },
       {
         id: "3-2",
-        content: "Az Aquapark jelenleg zárva. Egész évben nyitva: Aqua-Palace Élményfürdő, Gyógyfürdő, Árpád Uszoda. A Strand szezonálisan üzemel. Aktuális nyitvatartás: https://hungarospa.hu/",
+        content: "Yes. The Online Self-Assessment Examination is available under Education. You can read about access, format and topics here: [Online Self-Assessment](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-29T12:15:20")
+        timestamp: new Date("2025-10-31T09:30:20")
       }
     ],
-    createdAt: new Date("2025-10-29T12:15:00"),
-    lastMessageAt: new Date("2025-10-29T12:15:20"),
+    createdAt: new Date("2025-10-31T09:30:00"),
+    lastMessageAt: new Date("2025-10-31T09:30:20"),
     messageCount: 2,
     status: "completed"
   },
   {
     id: "4",
-    title: "Fizetési módok és kedvezmények",
+    title: "Research Grants & Fellowship",
     messages: [
       {
         id: "4-1",
-        content: "Milyen fizetési módokat fogadnak el a pénztáraknál?",
+        content: "How do I apply for a FESSH research grant or fellowship?",
         sender: "user",
-        timestamp: new Date("2025-10-29T13:05:00")
+        timestamp: new Date("2025-10-31T09:45:00")
       },
       {
         id: "4-2",
-        content: "A részletes információk a Fizetési módok menüpontban találhatók. Itt tájékozódhat a készpénz, bankkártya és egyéb elfogadott fizetési megoldásokról.",
+        content: "Application details, eligibility and timelines for Research Grants and Fellowships are listed under Research. See: [Research Grants](https://fessh.com/) and [Research Fellowship](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-29T13:05:20")
-      },
-      {
-        id: "4-3",
-        content: "Vannak szezonális akciók vagy kedvezmények?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T13:05:40")
-      },
-      {
-        id: "4-4",
-        content: "Igen, az Akciók oldalon rendszeresen frissülő ajánlatok érhetők el (például online jegyvásárlási kedvezmény, kombinált csomagok). Részletek: https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T13:05:55")
+        timestamp: new Date("2025-10-31T09:45:20")
       }
     ],
-    createdAt: new Date("2025-10-29T13:05:00"),
-    lastMessageAt: new Date("2025-10-29T13:05:55"),
-    messageCount: 4,
+    createdAt: new Date("2025-10-31T09:45:00"),
+    lastMessageAt: new Date("2025-10-31T09:45:20"),
+    messageCount: 2,
     status: "completed"
   },
   {
     id: "5",
-    title: "Hungarospa Medical Center – labor akció",
+    title: "Hand Trauma Network / Accreditation",
     messages: [
       {
         id: "5-1",
-        content: "Van most kedvezmény a laborvizsgálatokra a Medical Centerben?",
+        content: "Where can I find information about Hand Trauma Centers and accreditation?",
         sender: "user",
-        timestamp: new Date("2025-10-30T09:00:00")
+        timestamp: new Date("2025-10-31T10:00:00")
       },
       {
         id: "5-2",
-        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a Hungarospa Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
+        content: "See Clinical practice → Hand Trauma Network for accreditation criteria and centers. More here: [Hand Trauma Network](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-30T09:00:25")
+        timestamp: new Date("2025-10-31T10:00:20")
       }
     ],
-    createdAt: new Date("2025-10-30T09:00:00"),
-    lastMessageAt: new Date("2025-10-30T09:00:25"),
+    createdAt: new Date("2025-10-31T10:00:00"),
+    lastMessageAt: new Date("2025-10-31T10:00:20"),
     messageCount: 2,
     status: "completed"
   },
   {
     id: "6",
-    title: "Gyógykúra és szolgáltatások",
+    title: "Patronage for events",
     messages: [
       {
         id: "6-1",
-        content: "Mit tartalmaz a Gyógykúra élményfürdőzéssel akció?",
+        content: "How can I request FESSH patronage for my event?",
         sender: "user",
-        timestamp: new Date("2025-10-30T09:20:00")
+        timestamp: new Date("2025-10-31T10:15:00")
       },
       {
         id: "6-2",
-        content: "A Hajdúszoboszlói Gyógyfürdő gyógykúra szolgáltatásai mellé az akció időtartama alatt élményfürdő belépő jár. A részletes feltételek és időtartam az Akciók oldalon található: https://hungarospa.hu/",
+        content: "Guidelines and application information are under Meetings → Patronage. Please review requirements and submission process here: [Patronage](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-30T09:20:25")
+        timestamp: new Date("2025-10-31T10:15:20")
       }
     ],
-    createdAt: new Date("2025-10-30T09:20:00"),
-    lastMessageAt: new Date("2025-10-30T09:20:25"),
+    createdAt: new Date("2025-10-31T10:15:00"),
+    lastMessageAt: new Date("2025-10-31T10:15:20"),
     messageCount: 2,
     status: "completed"
   },
   {
     id: "7",
-    title: "Parkolás és megközelítés",
+    title: "Travel Award",
     messages: [
       {
         id: "7-1",
-        content: "Hol tudok parkolni és hogyan lehet a komplexumot megközelíteni?",
+        content: "Am I eligible for the FESSH Travel Award and how do I apply?",
         sender: "user",
-        timestamp: new Date("2025-10-30T09:40:00")
+        timestamp: new Date("2025-10-31T10:30:00")
       },
       {
         id: "7-2",
-        content: "A Parkolás és Megközelítés információk a honlapon találhatók, térképekkel és gyakorlati tudnivalókkal. Kérjük, ellenőrizze az aktuális részleteket indulás előtt: https://hungarospa.hu/",
+        content: "Travel Award details, including eligibility and deadlines, can be found under Education → Travel Award. Read more: [Travel Award](https://fessh.com/)",
         sender: "bot",
-        timestamp: new Date("2025-10-30T09:40:20")
+        timestamp: new Date("2025-10-31T10:30:20")
       }
     ],
-    createdAt: new Date("2025-10-30T09:40:00"),
-    lastMessageAt: new Date("2025-10-30T09:40:20"),
+    createdAt: new Date("2025-10-31T10:30:00"),
+    lastMessageAt: new Date("2025-10-31T10:30:20"),
+    messageCount: 2,
+    status: "completed"
+  },
+  {
+    id: "8",
+    title: "Contacts & Secretariat working hours",
+    messages: [
+      {
+        id: "8-1",
+        content: "How can I contact the FESSH Secretariat and what are the working hours?",
+        sender: "user",
+        timestamp: new Date("2025-10-31T10:45:00")
+      },
+      {
+        id: "8-2",
+        content: "You can reach the Secretariat at office@fessh.com, Monday–Friday 09:00–17:00. See Administration → Contacts for details: [Contacts](https://fessh.com/)",
+        sender: "bot",
+        timestamp: new Date("2025-10-31T10:45:25")
+      }
+    ],
+    createdAt: new Date("2025-10-31T10:45:00"),
+    lastMessageAt: new Date("2025-10-31T10:45:25"),
     messageCount: 2,
     status: "completed"
   }
@@ -239,13 +237,13 @@ const ChatConversations = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "active":
-        return "Aktív";
+        return "Active";
       case "completed":
-        return "Befejezett";
+        return "Finished";
       case "archived":
-        return "Archivált";
+        return "Archived";
       default:
-        return "Ismeretlen";
+        return "Unknown";
     }
   };
 
@@ -256,11 +254,11 @@ const ChatConversations = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Chatbot Beszélgetések</h2>
+        <h2 className="text-2xl font-bold">Chatbot conversations</h2>
         <div className="flex items-center space-x-2">
           <MessageSquare className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
-            {conversations.length} beszélgetés
+            {conversations.length} conversations
           </span>
         </div>
       </div>
@@ -285,7 +283,7 @@ const ChatConversations = () => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <MessageSquare className="h-4 w-4" />
-                      <span>{conversation.messageCount} üzenet</span>
+                      <span>{conversation.messageCount} messages</span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +298,7 @@ const ChatConversations = () => {
               <div className="text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2 mb-2">
                   <User className="h-4 w-4" />
-                  <span>Felhasználó</span>
+                  <span>User</span>
                 </div>
                 <p className="line-clamp-2">
                   {conversation.messages.find(m => m.sender === "user")?.content}

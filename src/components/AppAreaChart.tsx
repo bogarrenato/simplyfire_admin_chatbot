@@ -17,11 +17,11 @@ import {
 
 const chartConfig = {
   desktop: {
-    label: "Asztali számítógép",
+    label: "Desktop",
     color: "var(--chart-2)",
   },
   mobile: {
-    label: "Telefon",
+    label: "Mobile",
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
@@ -38,7 +38,7 @@ const chartData = [
 const AppAreaChart = () => {
   return (
     <div className="">
-      <h1 className="text-lg font-medium mb-6">Látogatók száma</h1>
+      <h1 className="text-lg font-medium mb-6">Visitors</h1>
       <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
         <AreaChart accessibilityLayer data={chartData}>
           <CartesianGrid vertical={false} />

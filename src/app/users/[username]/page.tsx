@@ -35,7 +35,7 @@ const SingleUserPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Hungarospa</BreadcrumbPage>
+            <BreadcrumbPage>FESSH</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -163,7 +163,7 @@ const SingleUserPage = () => {
                 <AvatarImage src="simplyfire.png" />
                 <AvatarFallback>SF</AvatarFallback>
               </Avatar>
-              <h1 className="text-xl font-semibold">Hungarospa</h1>
+              <h1 className="text-xl font-semibold">FESSH</h1>
             </div>
             <p className="text-sm text-muted-foreground">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vel
