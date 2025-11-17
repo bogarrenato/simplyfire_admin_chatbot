@@ -25,6 +25,8 @@ interface Conversation {
   status: "active" | "completed" | "archived";
 }
 
+const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
+
 const mockConversations: Conversation[] = [
   {
     id: "1",
@@ -38,7 +40,7 @@ const mockConversations: Conversation[] = [
       },
       {
         id: "1-2",
-        content: "Az online jegyvásárlás elérhető a Hungarospa oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
+        content: "Az online jegyvásárlás elérhető a SF oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
         sender: "bot",
         timestamp: new Date("2025-10-29T10:10:20")
       },
@@ -60,7 +62,7 @@ const mockConversations: Conversation[] = [
       },
       {
         id: "2-2",
-        content: "A konkrét árak a Hungarospa Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
+        content: "A konkrét árak a SF Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
         sender: "bot",
         timestamp: new Date("2025-10-29T11:00:20")
       },
@@ -140,7 +142,7 @@ const mockConversations: Conversation[] = [
   },
   {
     id: "5",
-    title: "Hungarospa Medical Center – labor akció",
+    title: "SF Medical Center – labor akció",
     messages: [
       {
         id: "5-1",
@@ -150,7 +152,7 @@ const mockConversations: Conversation[] = [
       },
       {
         id: "5-2",
-        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a Hungarospa Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
+        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a SF Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
         sender: "bot",
         timestamp: new Date("2025-10-30T09:00:25")
       }
@@ -210,17 +212,38 @@ const ChatConversations = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call delay
+    const controller = new AbortController();
     const loadConversations = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
-      setConversations(mockConversations);
-      setIsLoading(false);
+      setError(null);
+
+      try {
+        const remoteConversations = await fetchConversations(controller.signal);
+        if (remoteConversations.length === 0) {
+          setError("Nem érkezett beszélgetés adat, a mintapéldák láthatók.");
+          setConversations(mockConversations);
+        } else {
+          setConversations(remoteConversations);
+        }
+      } catch (err) {
+        if ((err as Error)?.name === "AbortError") return;
+        const message =
+          (err as Error)?.message ?? "Ismeretlen hiba történt a beszélgetések betöltése közben.";
+        console.error("Failed to load chats:", err);
+        setError(message);
+        setConversations(mockConversations);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
     };
 
     loadConversations();
+    return () => controller.abort();
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -264,6 +287,12 @@ const ChatConversations = () => {
           </span>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       <div className="grid gap-4">
         {conversations.map((conversation) => (
@@ -322,3 +351,114 @@ const ChatConversations = () => {
 };
 
 export default ChatConversations;
+
+const fetchConversations = async (signal?: AbortSignal): Promise<Conversation[]> => {
+  const response = await fetch(CHATS_ENDPOINT, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+    cache: "no-store",
+    signal,
+  });
+
+  const rawBody = await response.text();
+
+  if (!response.ok) {
+    throw new Error(rawBody || `Sikertelen válasz: ${response.status}`);
+  }
+
+  let payload: unknown;
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch (parseError) {
+    throw new Error(
+      `Nem sikerült feldolgozni a beszélgetés adatokat. Válasz: ${rawBody.slice(0, 200)}`
+    );
+  }
+
+  return normalizeConversations(payload);
+};
+
+const normalizeConversations = (payload: unknown): Conversation[] => {
+  const candidates = extractConversationArray(payload);
+
+  return candidates.map((chat, index) => {
+    const messages = extractMessages(chat?.messages ?? chat?.history ?? chat?.conversation);
+    const createdAt =
+      parseDate(chat?.createdAt ?? chat?.created_at ?? messages[0]?.timestamp) ?? new Date();
+    const lastMessageAt =
+      parseDate(chat?.lastMessageAt ?? chat?.updated_at ?? messages[messages.length - 1]?.timestamp) ??
+      createdAt;
+
+    return {
+      id: ensureString(chat?.id, `chat-${index}`),
+      title: ensureString(chat?.title, `Beszélgetés ${index + 1}`),
+      messages,
+      createdAt,
+      lastMessageAt,
+      messageCount: messages.length,
+      status: normalizeStatus(chat?.status),
+    };
+  });
+};
+
+const extractConversationArray = (payload: unknown): any[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (payload && typeof payload === "object") {
+    const obj = payload as Record<string, unknown>;
+    if (Array.isArray(obj.chats)) return obj.chats;
+    if (Array.isArray(obj.data)) return obj.data;
+    if (Array.isArray(obj.items)) return obj.items;
+  }
+  return [];
+};
+
+const extractMessages = (rawMessages: unknown): Message[] => {
+  if (!Array.isArray(rawMessages)) {
+    return [];
+  }
+
+  return rawMessages.map((msg, index) => {
+    const content = ensureString((msg as any)?.content ?? (msg as any)?.message ?? "", "");
+    const timestamp =
+      parseDate((msg as any)?.timestamp ?? (msg as any)?.createdAt ?? (msg as any)?.created_at) ??
+      new Date();
+    const senderRaw = ensureString((msg as any)?.sender ?? (msg as any)?.role, "user").toLowerCase();
+
+    return {
+      id: ensureString((msg as any)?.id, `message-${index}`),
+      content,
+      sender: senderRaw === "bot" || senderRaw === "assistant" ? "bot" : "user",
+      timestamp,
+    };
+  });
+};
+
+const parseDate = (value: unknown): Date | null => {
+  if (value instanceof Date) return value;
+  if (typeof value === "string" || typeof value === "number") {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+  return null;
+};
+
+const ensureString = (value: unknown, fallback: string): string => {
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value;
+  }
+  return fallback;
+};
+
+const normalizeStatus = (status: unknown): Conversation["status"] => {
+  if (typeof status !== "string") return "completed";
+  const normalized = status.toLowerCase();
+  if (normalized.includes("active")) return "active";
+  if (normalized.includes("archiv")) return "archived";
+  return "completed";
+};

@@ -23,7 +23,7 @@ interface UserProfile {
 
 const mockProfile: UserProfile = {
   id: "user_123",
-  name: "Hungarospa",
+  name: "SF",
   email: "contact@hungarospa.hu",
   avatar: "/api/placeholder/150/150",
   bankAccount: "1234567890123456",

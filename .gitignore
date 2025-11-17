@@ -35,3 +35,6 @@ logs/
 
 # Optional eslint cache
 .eslintcache
+
+# Local HTTPS certificates
+certs/
