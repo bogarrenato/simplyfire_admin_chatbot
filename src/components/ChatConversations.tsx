@@ -25,6 +25,30 @@ interface Conversation {
   status: "active" | "completed" | "archived";
 }
 
+interface RemoteConversationShape extends Record<string, unknown> {
+  id?: string;
+  title?: string;
+  messages?: RemoteMessageShape[];
+  history?: RemoteMessageShape[];
+  conversation?: RemoteMessageShape[];
+  createdAt?: string;
+  created_at?: string;
+  lastMessageAt?: string;
+  updated_at?: string;
+  status?: string;
+}
+
+interface RemoteMessageShape extends Record<string, unknown> {
+  id?: string;
+  content?: string;
+  message?: string;
+  timestamp?: string | number | Date;
+  createdAt?: string | number | Date;
+  created_at?: string | number | Date;
+  sender?: string;
+  role?: string;
+}
+
 const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
 
 const mockConversations: Conversation[] = [
@@ -371,7 +395,7 @@ const fetchConversations = async (signal?: AbortSignal): Promise<Conversation[]>
   let payload: unknown;
   try {
     payload = rawBody ? JSON.parse(rawBody) : null;
-  } catch (parseError) {
+  } catch {
     throw new Error(
       `Nem sikerült feldolgozni a beszélgetés adatokat. Válasz: ${rawBody.slice(0, 200)}`
     );
@@ -403,33 +427,37 @@ const normalizeConversations = (payload: unknown): Conversation[] => {
   });
 };
 
-const extractConversationArray = (payload: unknown): any[] => {
+const extractConversationArray = (payload: unknown): RemoteConversationShape[] => {
   if (Array.isArray(payload)) {
-    return payload;
+    return payload.filter(isRemoteConversation);
   }
   if (payload && typeof payload === "object") {
     const obj = payload as Record<string, unknown>;
-    if (Array.isArray(obj.chats)) return obj.chats;
-    if (Array.isArray(obj.data)) return obj.data;
-    if (Array.isArray(obj.items)) return obj.items;
+    const candidates = ["chats", "data", "items"] as const;
+    for (const key of candidates) {
+      const maybeList = obj[key];
+      if (Array.isArray(maybeList)) {
+        return maybeList.filter(isRemoteConversation);
+      }
+    }
   }
   return [];
 };
 
-const extractMessages = (rawMessages: unknown): Message[] => {
+const extractMessages = (rawMessages: RemoteMessageShape[] | undefined): Message[] => {
   if (!Array.isArray(rawMessages)) {
     return [];
   }
 
   return rawMessages.map((msg, index) => {
-    const content = ensureString((msg as any)?.content ?? (msg as any)?.message ?? "", "");
+    const content = ensureString(msg.content ?? msg.message ?? "", "");
     const timestamp =
-      parseDate((msg as any)?.timestamp ?? (msg as any)?.createdAt ?? (msg as any)?.created_at) ??
+      parseDate(msg.timestamp ?? msg.createdAt ?? msg.created_at) ??
       new Date();
-    const senderRaw = ensureString((msg as any)?.sender ?? (msg as any)?.role, "user").toLowerCase();
+    const senderRaw = ensureString(msg.sender ?? msg.role, "user").toLowerCase();
 
     return {
-      id: ensureString((msg as any)?.id, `message-${index}`),
+      id: ensureString(msg.id, `message-${index}`),
       content,
       sender: senderRaw === "bot" || senderRaw === "assistant" ? "bot" : "user",
       timestamp,
@@ -462,3 +490,6 @@ const normalizeStatus = (status: unknown): Conversation["status"] => {
   if (normalized.includes("archiv")) return "archived";
   return "completed";
 };
+
+const isRemoteConversation = (value: unknown): value is RemoteConversationShape =>
+  typeof value === "object" && value !== null;

@@ -12,25 +12,14 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import DateRangePicker from "./DateRangePicker";
-import { formatISO, subDays } from "date-fns";
-import { format } from "date-fns";
-import { hu } from "date-fns/locale";
+import { subDays } from "date-fns";
+import type { UsageMetrics } from "@/types/usage";
+import { fetchUsageMetrics } from "@/services/usage-service";
 
 type ChartDataPoint = {
   label: string;
   questions: number;
 };
-
-interface UsageMetrics {
-  totalQuestions: number;
-  avgQuestions: number;
-  peakDay: string;
-  peakQuestions: number;
-  buckets: Array<{ label: string; count: number }>;
-}
-
-const USAGE_API_BASE_URL =
-  "https://simplyfire.ai:5001/api/noilezer/usage";
 
 const chartConfig = {
   questions: {
@@ -199,127 +188,6 @@ const AppBarChart = () => {
   );
 };
 
-const fetchUsageMetrics = async (
-  from: Date,
-  to: Date,
-  signal?: AbortSignal
-): Promise<UsageMetrics> => {
-  const params = new URLSearchParams({
-    from: formatISO(from, { representation: "date" }),
-    to: formatISO(to, { representation: "date" }),
-  });
-
-  const response = await fetch(`${USAGE_API_BASE_URL}?${params.toString()}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-    cache: "no-store",
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Usage API responded with ${response.status}`);
-  }
-
-  const payload = await response.json();
-  return normalizeUsagePayload(payload);
-};
-
-const normalizeUsagePayload = (payload: unknown): UsageMetrics => {
-  const buckets = extractBuckets(payload);
-  const totalQuestions =
-    readNumber((payload as any)?.totalQuestions) ??
-    readNumber((payload as any)?.total) ??
-    buckets.reduce((acc, bucket) => acc + bucket.count, 0);
-
-  const avgQuestions =
-    readNumber((payload as any)?.avgQuestions) ??
-    readNumber((payload as any)?.averageQuestions) ??
-    (buckets.length ? Math.round(totalQuestions / buckets.length) : 0);
-
-  const peakBucket = buckets.reduce(
-    (acc, bucket) => (bucket.count > acc.count ? bucket : acc),
-    { label: "N/A", count: 0 }
-  );
-
-  const peakQuestions =
-    readNumber((payload as any)?.peakQuestions) ?? peakBucket.count;
-  const peakDay =
-    readString((payload as any)?.peakDay) ?? peakBucket.label ?? "n/a";
-
-  return {
-    totalQuestions,
-    avgQuestions,
-    peakDay,
-    peakQuestions,
-    buckets,
-  };
-};
-
-const extractBuckets = (payload: any): Array<{ label: string; count: number }> => {
-  const candidateLists = [
-    payload?.buckets,
-    payload?.data,
-    payload?.usage,
-    Array.isArray(payload) ? payload : null,
-  ];
-
-  const source = candidateLists.find(Array.isArray) ?? [];
-  return source
-    .map((entry: any) => {
-      if (typeof entry !== "object" || entry === null) return null;
-      const label =
-        readString(entry.label) ??
-        readString(entry.interval) ??
-        buildRangeLabel(entry.start ?? entry.from, entry.end ?? entry.to);
-      const count =
-        readNumber(entry.count) ??
-        readNumber(entry.questions) ??
-        readNumber(entry.total) ??
-        readNumber(entry.value) ??
-        0;
-      if (!label) return null;
-      return { label, count };
-    })
-    .filter((entry): entry is { label: string; count: number } => Boolean(entry));
-};
-
-const readNumber = (value: unknown): number | null => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-  return null;
-};
-
-const readString = (value: unknown): string | null => {
-  if (typeof value === "string" && value.trim().length > 0) {
-    return value;
-  }
-  return null;
-};
-
-const buildRangeLabel = (start?: string, end?: string): string | null => {
-  try {
-    if (start && end) {
-      return `${format(new Date(start), "MMM dd", { locale: hu })} - ${format(
-        new Date(end),
-        "MMM dd",
-        { locale: hu }
-      )}`;
-    }
-    if (start) {
-      return format(new Date(start), "MMM dd", { locale: hu });
-    }
-    if (end) {
-      return format(new Date(end), "MMM dd", { locale: hu });
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
-
 const StatsSkeleton = () => (
   <div className="grid grid-cols-3 gap-4 mb-4">
     {[0, 1, 2].map((index) => (
@@ -331,17 +199,19 @@ const StatsSkeleton = () => (
   </div>
 );
 
-const ChartSkeleton = () => (
-  <div className="flex min-h-[220px] items-end justify-between gap-4 rounded-lg border border-dashed border-muted-foreground/20 p-4">
-    {Array.from({ length: 4 }).map((_, index) => (
-      <Skeleton
-        // eslint-disable-next-line react/no-array-index-key
-        key={index}
-        className="h-[160px] w-full rounded-sm"
-        style={{ animationDelay: `${index * 150}ms` }}
-      />
-    ))}
-  </div>
-);
+const ChartSkeleton = () => {
+  const placeholders = ["a", "b", "c", "d"] as const;
+  return (
+    <div className="flex min-h-[220px] items-end justify-between gap-4 rounded-lg border border-dashed border-muted-foreground/20 p-4">
+      {placeholders.map((token, index) => (
+        <Skeleton
+          key={token}
+          className="h-[160px] w-full rounded-sm"
+          style={{ animationDelay: `${index * 150}ms` }}
+        />
+      ))}
+    </div>
+  );
+};
 
 export default AppBarChart;
