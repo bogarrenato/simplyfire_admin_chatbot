@@ -89,7 +89,7 @@ const AppSidebar = () => {
                     </Link>
                   </SidebarMenuButton>
                   {item.title === "Üzenetek" && (
-                    <SidebarMenuBadge>24</SidebarMenuBadge>
+                    <SidebarMenuBadge></SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
               ))}
