@@ -1,65 +1,48 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import DateRangePicker from "./DateRangePicker";
-import {
-  generateRevenueData,
-  generateRevenueStats,
-  type ChartData,
-} from "@/lib/data-generator";
 import { subDays } from "date-fns";
-
-const chartConfig = {
-  questions: {
-    label: "Kérdezések",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig;
+import type { UsageStats } from "@/types/usage";
+import { fetchUsageStats } from "@/services/usage-service";
 
 const AppBarChart = () => {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [stats, setStats] = useState<{
-    totalQuestions: number;
-    avgQuestions: number;
-    peakDay: string;
-    peakQuestions: number;
-  } | null>(null);
+  const [stats, setStats] = useState<UsageStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState<Date>(new Date());
 
   useEffect(() => {
-    generateData(startDate, endDate);
-  }, [
-    startDate,
-    endDate,
-  ]);
+    const controller = new AbortController();
+    const loadStats = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchUsageStats(startDate, endDate, controller.signal);
+        setStats(data);
+      } catch (err) {
+        if ((err as Error)?.name === "AbortError") return;
+        console.error("Failed to load usage stats", err);
+        setError("Nem sikerült betölteni a párbeszédek adatait. Próbáld újra később.");
+        setStats(null);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  const generateData = async (start: Date, end: Date) => {
-    setLoading(true);
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const data = generateRevenueData(start, end);
-    const statistics = generateRevenueStats(data);
-    setChartData(data);
-    setStats(statistics);
-    setLoading(false);
-  };
+    loadStats();
+    return () => controller.abort();
+  }, [startDate, endDate]);
 
   const handleDateRangeChange = (start: Date, end: Date) => {
-    setStartDate(start);
-    setEndDate(end);
-    generateData(start, end);
+    const normalizedStart = start <= end ? start : end;
+    const normalizedEnd = end >= start ? end : start;
+    setStartDate(normalizedStart);
+    setEndDate(normalizedEnd);
   };
 
   const quickRanges = [
@@ -78,7 +61,7 @@ const AppBarChart = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap">
-        <h1 className="text-lg font-medium">Kérdezések száma</h1>
+        <h1 className="text-lg font-medium">Párbeszédek száma</h1>
         <div className="flex items-center space-x-2">
           <div className="flex space-x-1 flex-wrap gap-2">
             {quickRanges.map((range) => (
@@ -98,62 +81,32 @@ const AppBarChart = () => {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <StatsSkeleton />
+      ) : error ? (
+        <p className="text-sm text-destructive">{error}</p>
+      ) : stats ? (
+        <div className="flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-4xl font-bold text-primary">
+              {stats.conversationCount.toLocaleString()}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Összes párbeszéd
+            </p>
+          </div>
         </div>
-      ) : (
-        <>
-          {stats && (
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.totalQuestions.toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">Összes kérdés</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.avgQuestions.toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Átlagos kérdések
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.peakQuestions.toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Csúcs nap ({stats.peakDay})
-                </p>
-              </div>
-            </div>
-          )}
-
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value) => value}
-              />
-              <YAxis tickLine={false} tickMargin={10} axisLine={false} />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent />} />
-              <Bar
-                dataKey="questions"
-                fill="var(--color-questions)"
-                radius={4}
-              />
-            </BarChart>
-          </ChartContainer>
-        </>
-      )}
+      ) : null}
     </div>
   );
 };
+
+const StatsSkeleton = () => (
+  <div className="flex items-center justify-center">
+    <div className="text-center space-y-2">
+      <Skeleton className="mx-auto h-12 w-32" />
+      <Skeleton className="mx-auto h-4 w-24" />
+    </div>
+  </div>
+);
 
 export default AppBarChart;

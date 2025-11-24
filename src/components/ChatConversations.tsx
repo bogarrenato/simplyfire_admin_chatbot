@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import ChatModal from "./ChatModal";
 import ChatConversationsSkeleton from "./ChatConversationsSkeleton";
+import { Button } from "@/components/ui/button";
+import { fetchConversationsPage } from "@/services/chat-service";
 
 interface Message {
   id: string;
@@ -38,7 +40,7 @@ const mockConversations: Conversation[] = [
       },
       {
         id: "1-2",
-        content: "Az online jegyvásárlás elérhető a Hungarospa oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
+        content: "Az online jegyvásárlás elérhető a SF oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
         sender: "bot",
         timestamp: new Date("2025-10-29T10:10:20")
       },
@@ -60,7 +62,7 @@ const mockConversations: Conversation[] = [
       },
       {
         id: "2-2",
-        content: "A konkrét árak a Hungarospa Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
+        content: "A konkrét árak a SF Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
         sender: "bot",
         timestamp: new Date("2025-10-29T11:00:20")
       },
@@ -140,7 +142,7 @@ const mockConversations: Conversation[] = [
   },
   {
     id: "5",
-    title: "Hungarospa Medical Center – labor akció",
+    title: "SF Medical Center – labor akció",
     messages: [
       {
         id: "5-1",
@@ -150,7 +152,7 @@ const mockConversations: Conversation[] = [
       },
       {
         id: "5-2",
-        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a Hungarospa Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
+        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a SF Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
         sender: "bot",
         timestamp: new Date("2025-10-30T09:00:25")
       }
@@ -210,18 +212,67 @@ const ChatConversations = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
-    // Simulate API call delay
+    const controller = new AbortController();
     const loadConversations = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
-      setConversations(mockConversations);
-      setIsLoading(false);
+      setError(null);
+
+      try {
+        const response = await fetchConversationsPage(1, controller.signal);
+        if (response.conversations.length === 0) {
+          setError("Nem érkezett beszélgetés adat, a mintapéldák láthatók.");
+          setConversations(mockConversations);
+        } else {
+          setConversations(response.conversations);
+          setCurrentPage(response.currentPage);
+          setTotalPages(response.totalPages);
+        }
+      } catch (err) {
+        if ((err as Error)?.name === "AbortError") return;
+        const message =
+          (err as Error)?.message ?? "Ismeretlen hiba történt a beszélgetések betöltése közben.";
+        console.error("Failed to load chats:", err);
+        setError(message);
+        setConversations(mockConversations);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
     };
 
     loadConversations();
+    return () => controller.abort();
   }, []);
+
+  const loadMoreConversations = async () => {
+    if (currentPage >= totalPages || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    const controller = new AbortController();
+
+    try {
+      const nextPage = currentPage + 1;
+      const response = await fetchConversationsPage(nextPage, controller.signal);
+      setConversations((prev) => [...prev, ...response.conversations]);
+      setCurrentPage(response.currentPage);
+      setTotalPages(response.totalPages);
+    } catch (err) {
+      if ((err as Error)?.name === "AbortError") return;
+      console.error("Failed to load more chats:", err);
+      setError("Nem sikerült betölteni a további beszélgetéseket.");
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsLoadingMore(false);
+      }
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -264,6 +315,12 @@ const ChatConversations = () => {
           </span>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       <div className="grid gap-4">
         {conversations.map((conversation) => (
@@ -310,6 +367,18 @@ const ChatConversations = () => {
           </Card>
         ))}
       </div>
+
+      {currentPage < totalPages && (
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={loadMoreConversations}
+            disabled={isLoadingMore}
+            variant="outline"
+          >
+            {isLoadingMore ? "Betöltés..." : `Továbbiak betöltése (${currentPage}/${totalPages})`}
+          </Button>
+        </div>
+      )}
 
       {selectedConversation && (
         <ChatModal

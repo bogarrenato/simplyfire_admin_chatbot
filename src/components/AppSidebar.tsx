@@ -67,8 +67,8 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <Image src="/hungarospa.png" alt="logo" width={20} height={20} />
-                <span>Hungarospa admin oldal</span>
+                {/* <Image src="/simplyfire.png" alt="logo" width={20} height={20} /> */}
+                <span>Noilézer admin oldal</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -89,7 +89,7 @@ const AppSidebar = () => {
                     </Link>
                   </SidebarMenuButton>
                   {item.title === "Üzenetek" && (
-                    <SidebarMenuBadge>24</SidebarMenuBadge>
+                    <SidebarMenuBadge></SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
               ))}
@@ -190,13 +190,13 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup> */}
       </SidebarContent>
-      <SidebarFooter>
+     {/*  <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Hungarospa <ChevronUp className="ml-auto" />
+                  <User2 /> SF <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -208,7 +208,7 @@ const AppSidebar = () => {
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   );
 };

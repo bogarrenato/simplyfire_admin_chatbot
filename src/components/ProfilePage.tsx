@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Mail, CreditCard, Calendar, Shield, Edit } from "lucide-react";
+import { User, Mail, Calendar, Shield, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 
@@ -23,7 +23,7 @@ interface UserProfile {
 
 const mockProfile: UserProfile = {
   id: "user_123",
-  name: "Hungarospa",
+  name: "SF",
   email: "contact@hungarospa.hu",
   avatar: "/api/placeholder/150/150",
   bankAccount: "1234567890123456",
@@ -48,12 +48,6 @@ const ProfilePage = () => {
 
     loadProfile();
   }, []);
-
-  const maskBankAccount = (account: string) => {
-    const lastFour = account.slice(-4);
-    const masked = "*".repeat(account.length - 4);
-    return `${masked}${lastFour}`;
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

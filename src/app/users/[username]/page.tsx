@@ -21,6 +21,15 @@ import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
 
+// Statikus export esetén meg kell adni, melyik username-eket generáljuk
+export function generateStaticParams() {
+  // Ha nincs szükség dinamikus username-ekre, üres tömböt adunk vissza
+  // Vagy visszaadhatunk egy példa username-t, ha szükséges
+  return [
+    { username: "SF" }, // Példa username, ha szükséges
+  ];
+}
+
 const SingleUserPage = () => {
   return (
     <div className="">
@@ -35,7 +44,7 @@ const SingleUserPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Hungarospa</BreadcrumbPage>
+            <BreadcrumbPage>SF</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -163,7 +172,7 @@ const SingleUserPage = () => {
                 <AvatarImage src="simplyfire.png" />
                 <AvatarFallback>SF</AvatarFallback>
               </Avatar>
-              <h1 className="text-xl font-semibold">Hungarospa</h1>
+              <h1 className="text-xl font-semibold">SF</h1>
             </div>
             <p className="text-sm text-muted-foreground">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vel

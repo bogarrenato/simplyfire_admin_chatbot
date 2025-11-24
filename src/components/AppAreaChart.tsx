@@ -1,103 +1,112 @@
 "use client";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-const chartConfig = {
-  desktop: {
-    label: "Asztali számítógép",
-    color: "var(--chart-2)",
-  },
-  mobile: {
-    label: "Telefon",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig;
-
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import DateRangePicker from "./DateRangePicker";
+import { subDays } from "date-fns";
+import type { UsageStats } from "@/types/usage";
+import { fetchUsageStats } from "@/services/usage-service";
 
 const AppAreaChart = () => {
+  const [stats, setStats] = useState<UsageStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadStats = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchUsageStats(startDate, endDate, controller.signal);
+        setStats(data);
+      } catch (err) {
+        if ((err as Error)?.name === "AbortError") return;
+        console.error("Failed to load usage stats", err);
+        setError("Nem sikerült betölteni az üzenetek adatait. Próbáld újra később.");
+        setStats(null);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadStats();
+    return () => controller.abort();
+  }, [startDate, endDate]);
+
+  const handleDateRangeChange = (start: Date, end: Date) => {
+    const normalizedStart = start <= end ? start : end;
+    const normalizedEnd = end >= start ? end : start;
+    setStartDate(normalizedStart);
+    setEndDate(normalizedEnd);
+  };
+
+  const quickRanges = [
+    { label: "Elmúlt 7 nap", days: 7 },
+    { label: "Elmúlt 30 nap", days: 30 },
+    { label: "Elmúlt 90 nap", days: 90 },
+    { label: "Elmúlt év", days: 365 },
+  ];
+
+  const handleQuickRange = (days: number) => {
+    const end = new Date();
+    const start = subDays(end, days);
+    handleDateRangeChange(start, end);
+  };
+
   return (
-    <div className="">
-      <h1 className="text-lg font-medium mb-6">Látogatók száma</h1>
-      <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-        <AreaChart accessibilityLayer data={chartData}>
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            tickMargin={10}
-            axisLine={false}
-            tickFormatter={(value) => value.slice(0, 3)}
-          />
-          <YAxis tickLine={false} tickMargin={10} axisLine={false} />
-          <ChartTooltip content={<ChartTooltipContent />} />
-          <ChartLegend content={<ChartLegendContent />} />
-          <defs>
-            <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor="var(--color-desktop)"
-                stopOpacity={0.8}
-              />
-              <stop
-                offset="95%"
-                stopColor="var(--color-desktop)"
-                stopOpacity={0.1}
-              />
-            </linearGradient>
-            <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor="var(--color-mobile)"
-                stopOpacity={0.8}
-              />
-              <stop
-                offset="95%"
-                stopColor="var(--color-mobile)"
-                stopOpacity={0.1}
-              />
-            </linearGradient>
-          </defs>
-          <Area
-            dataKey="mobile"
-            type="natural"
-            fill="url(#fillMobile)"
-            fillOpacity={0.4}
-            stroke="var(--color-mobile)"
-            stackId="a"
-          />
-          <Area
-            dataKey="desktop"
-            type="natural"
-            fill="url(#fillDesktop)"
-            fillOpacity={0.4}
-            stroke="var(--color-desktop)"
-            stackId="a"
-          />
-        </AreaChart>
-      </ChartContainer>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap">
+        <h1 className="text-lg font-medium">Üzenetek száma</h1>
+        <div className="flex items-center space-x-2">
+          <div className="flex space-x-1 flex-wrap gap-2">
+            {quickRanges.map((range) => (
+              <Button
+                key={range.days}
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuickRange(range.days)}
+                className="text-xs"
+              >
+                {range.label}
+              </Button>
+            ))}
+            <DateRangePicker onDateRangeChange={handleDateRangeChange} />
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <StatsSkeleton />
+      ) : error ? (
+        <p className="text-sm text-destructive">{error}</p>
+      ) : stats ? (
+        <div className="flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-4xl font-bold text-primary">
+              {stats.messageCount.toLocaleString()}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Összes üzenet
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };
+
+const StatsSkeleton = () => (
+  <div className="flex items-center justify-center">
+    <div className="text-center space-y-2">
+      <Skeleton className="mx-auto h-12 w-32" />
+      <Skeleton className="mx-auto h-4 w-24" />
+    </div>
+  </div>
+);
 
 export default AppAreaChart;
