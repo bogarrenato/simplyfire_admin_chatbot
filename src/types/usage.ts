@@ -11,6 +11,12 @@ export interface UsageMetrics {
   buckets: UsageBucket[];
 }
 
+// Új API válasz típus a főoldalhoz
+export interface UsageStats {
+  conversationCount: number;  // Párbeszédek száma
+  messageCount: number;      // Üzenetek száma
+}
+
 
 
 

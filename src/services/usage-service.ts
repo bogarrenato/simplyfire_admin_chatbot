@@ -1,7 +1,7 @@
 import { formatISO } from "date-fns";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
-import type { UsageBucket, UsageMetrics } from "@/types/usage";
+import type { UsageBucket, UsageMetrics, UsageStats } from "@/types/usage";
 
 const USAGE_API_BASE_URL = "https://simplyfire.ai:5001/api/noilezer/usage";
 
@@ -150,6 +150,56 @@ const buildRangeLabel = (start?: string, end?: string): string | null => {
 
 const isRecord = (value: unknown): value is UnknownRecord =>
   typeof value === "object" && value !== null;
+
+/**
+ * Lekéri a főoldalhoz szükséges statisztikákat (Párbeszédek és Üzenetek száma)
+ * @param from Opcionális kezdő dátum az intervallumhoz
+ * @param to Opcionális vég dátum az intervallumhoz
+ * @param signal Opcionális AbortSignal a kérés megszakításához
+ * @returns UsageStats objektum conversationCount (Párbeszédek) és messageCount (Üzenetek) értékekkel
+ */
+export const fetchUsageStats = async (
+  from?: Date,
+  to?: Date,
+  signal?: AbortSignal
+): Promise<UsageStats> => {
+  // Query paraméterek összeállítása
+  const params = new URLSearchParams();
+  if (from) {
+    params.append("from", formatISO(from, { representation: "date" }));
+  }
+  if (to) {
+    params.append("to", formatISO(to, { representation: "date" }));
+  }
+
+  const url = params.toString() 
+    ? `${USAGE_API_BASE_URL}?${params.toString()}`
+    : USAGE_API_BASE_URL;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Usage Stats API responded with ${response.status}`);
+  }
+
+  const payload = await response.json();
+  
+  // Normalizáljuk a választ, hogy biztosan tartalmazza a conversationCount és messageCount mezőket
+  const record = isRecord(payload) ? payload : {};
+  
+  const conversationCount = readNumber(record.conversationCount) ?? 0;
+  const messageCount = readNumber(record.messageCount) ?? 0;
+
+  return {
+    conversationCount,
+    messageCount,
+  };
+};
 
 
 

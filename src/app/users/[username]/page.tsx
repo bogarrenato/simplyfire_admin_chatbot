@@ -21,6 +21,15 @@ import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
 
+// Statikus export esetén meg kell adni, melyik username-eket generáljuk
+export function generateStaticParams() {
+  // Ha nincs szükség dinamikus username-ekre, üres tömböt adunk vissza
+  // Vagy visszaadhatunk egy példa username-t, ha szükséges
+  return [
+    { username: "SF" }, // Példa username, ha szükséges
+  ];
+}
+
 const SingleUserPage = () => {
   return (
     <div className="">

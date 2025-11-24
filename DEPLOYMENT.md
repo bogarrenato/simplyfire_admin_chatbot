@@ -1,5 +1,20 @@
 # Deployment Guide - SimplyFire Admin Chatbot
 
+## ⚡ Gyors válasz: Statikus HTML+CSS+JS fájlok
+
+**A projekt most már statikus exportot generál!** 
+
+A `npm run build` parancs után az **`out/`** mappa tartalmazza az összes statikus fájlt (HTML, CSS, JS), amit bármilyen statikus hostingon lehet hostolni:
+- GitHub Pages
+- Netlify
+- Vercel (statikus)
+- AWS S3 + CloudFront
+- Bármilyen web szerver (nginx, Apache, stb.)
+
+**Az `out/` mappa tartalmát kell csak elküldeni a DevOps-nak statikus hosting esetén!**
+
+---
+
 ## Mit kell elküldeni a DevOps mérnöknek?
 
 ### ✅ BELEFOGYÓ FÁJLOK ÉS MAPPAK:
@@ -34,24 +49,54 @@
 
 ## Deployment lépések (DevOps mérnöknek)
 
-### 1. Függőségek telepítése
+### Opció 1: Statikus hosting (AJÁNLOTT) ⭐
+
+A projekt **statikus exportot** generál, ami azt jelenti, hogy csak HTML+CSS+JS fájlokat tartalmaz.
+
+#### 1. Build futtatása (fejlesztői gépen)
 ```bash
 npm install
-# vagy
-pnpm install
+npm run build
 ```
 
-### 2. Environment változók beállítása
-Hozz létre egy `.env` vagy `.env.production` fájlt a szükséges változókkal.
-(A jelenlegi projektben nincs explicit .env fájl, de ha később szükséges, itt kell beállítani.)
+#### 2. Az `out/` mappa tartalmának hostolása
+Az `out/` mappa tartalmazza az összes statikus fájlt:
+- `out/index.html` - Főoldal
+- `out/_next/static/` - CSS és JavaScript fájlok
+- `out/` - Minden más statikus fájl
 
-### 3. Build futtatása
+**Egyszerűen másold az `out/` mappa tartalmát a web szerverre!**
+
+Példák:
+- **nginx**: Másold az `out/` tartalmát a `/var/www/html/` mappába
+- **Apache**: Másold az `out/` tartalmát a `/var/www/html/` mappába
+- **GitHub Pages**: Push-old az `out/` mappa tartalmát a `gh-pages` branch-re
+- **Netlify/Vercel**: Csatlakoztasd a Git repository-t, automatikusan build-eli
+
+**Nincs szükség Node.js szerverre!** Csak egy statikus fájl szerver kell.
+
+---
+
+### Opció 2: Node.js szerver (ha később változtatnál)
+
+Ha vissza szeretnéd állítani a Node.js szerveres működést:
+
+1. **Változtasd meg a `next.config.ts`-t:**
+   - Töröld ki az `output: 'export'` sort
+   - Töröld ki az `images.unoptimized: true` sort
+
+2. **Függőségek telepítése**
+```bash
+npm install
+```
+
+3. **Build futtatása**
 ```bash
 npm run build
 ```
 Ez létrehozza a `.next/` mappát a production build-tel.
 
-### 4. Alkalmazás indítása
+4. **Alkalmazás indítása**
 ```bash
 npm start
 # vagy

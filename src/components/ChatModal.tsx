@@ -168,33 +168,39 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
             {conversation.messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex ${message.sender === "user" ? "justify-start" : "justify-end"}`}
               >
                 <div
                   className={`max-w-[80%] rounded-lg p-4 ${
                     message.sender === "user"
-                      ? "bg-primary text-primary-foreground ml-12"
-                      : "bg-muted mr-12"
+                      ? "bg-muted mr-12"
+                      : "bg-primary text-primary-foreground ml-12"
                   }`}
                 >
                   <div className="flex items-start space-x-2">
                     <div className="shrink-0">
                       {message.sender === "user" ? (
-                        <User className="h-5 w-5 text-primary-foreground" />
+                        <User className="h-5 w-5 text-muted-foreground" />
                       ) : (
-                        <Bot className="h-5 w-5 text-muted-foreground" />
+                        <Bot className="h-5 w-5 text-primary-foreground" />
                       )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-sm font-medium">
+                        <span className={`text-sm font-medium ${
+                          message.sender === "user" ? "text-foreground" : "text-primary-foreground"
+                        }`}>
                           {message.sender === "user" ? "Felhasználó" : "Chatbot"}
                         </span>
-                        <span className="text-xs opacity-70">
+                        <span className={`text-xs ${
+                          message.sender === "user" ? "opacity-70" : "opacity-80"
+                        }`}>
                           {format(message.timestamp, "HH:mm", { locale: hu })}
                         </span>
                       </div>
-                      <div className="whitespace-pre-wrap text-sm">
+                      <div className={`whitespace-pre-wrap text-sm ${
+                        message.sender === "user" ? "text-foreground" : "text-primary-foreground"
+                      }`}>
                         {renderMessageContent(message.content)}
                       </div>
                     </div>

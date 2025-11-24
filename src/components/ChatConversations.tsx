@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import ChatModal from "./ChatModal";
 import ChatConversationsSkeleton from "./ChatConversationsSkeleton";
+import { Button } from "@/components/ui/button";
+import { fetchConversationsPage } from "@/services/chat-service";
 
 interface Message {
   id: string;
@@ -24,32 +26,6 @@ interface Conversation {
   messageCount: number;
   status: "active" | "completed" | "archived";
 }
-
-interface RemoteConversationShape extends Record<string, unknown> {
-  id?: string;
-  title?: string;
-  messages?: RemoteMessageShape[];
-  history?: RemoteMessageShape[];
-  conversation?: RemoteMessageShape[];
-  createdAt?: string;
-  created_at?: string;
-  lastMessageAt?: string;
-  updated_at?: string;
-  status?: string;
-}
-
-interface RemoteMessageShape extends Record<string, unknown> {
-  id?: string;
-  content?: string;
-  message?: string;
-  timestamp?: string | number | Date;
-  createdAt?: string | number | Date;
-  created_at?: string | number | Date;
-  sender?: string;
-  role?: string;
-}
-
-const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
 
 const mockConversations: Conversation[] = [
   {
@@ -237,6 +213,9 @@ const ChatConversations = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -245,12 +224,14 @@ const ChatConversations = () => {
       setError(null);
 
       try {
-        const remoteConversations = await fetchConversations(controller.signal);
-        if (remoteConversations.length === 0) {
+        const response = await fetchConversationsPage(1, controller.signal);
+        if (response.conversations.length === 0) {
           setError("Nem érkezett beszélgetés adat, a mintapéldák láthatók.");
           setConversations(mockConversations);
         } else {
-          setConversations(remoteConversations);
+          setConversations(response.conversations);
+          setCurrentPage(response.currentPage);
+          setTotalPages(response.totalPages);
         }
       } catch (err) {
         if ((err as Error)?.name === "AbortError") return;
@@ -269,6 +250,29 @@ const ChatConversations = () => {
     loadConversations();
     return () => controller.abort();
   }, []);
+
+  const loadMoreConversations = async () => {
+    if (currentPage >= totalPages || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    const controller = new AbortController();
+
+    try {
+      const nextPage = currentPage + 1;
+      const response = await fetchConversationsPage(nextPage, controller.signal);
+      setConversations((prev) => [...prev, ...response.conversations]);
+      setCurrentPage(response.currentPage);
+      setTotalPages(response.totalPages);
+    } catch (err) {
+      if ((err as Error)?.name === "AbortError") return;
+      console.error("Failed to load more chats:", err);
+      setError("Nem sikerült betölteni a további beszélgetéseket.");
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsLoadingMore(false);
+      }
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -364,6 +368,18 @@ const ChatConversations = () => {
         ))}
       </div>
 
+      {currentPage < totalPages && (
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={loadMoreConversations}
+            disabled={isLoadingMore}
+            variant="outline"
+          >
+            {isLoadingMore ? "Betöltés..." : `Továbbiak betöltése (${currentPage}/${totalPages})`}
+          </Button>
+        </div>
+      )}
+
       {selectedConversation && (
         <ChatModal
           conversation={selectedConversation}
@@ -375,121 +391,3 @@ const ChatConversations = () => {
 };
 
 export default ChatConversations;
-
-const fetchConversations = async (signal?: AbortSignal): Promise<Conversation[]> => {
-  const response = await fetch(CHATS_ENDPOINT, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-    cache: "no-store",
-    signal,
-  });
-
-  const rawBody = await response.text();
-
-  if (!response.ok) {
-    throw new Error(rawBody || `Sikertelen válasz: ${response.status}`);
-  }
-
-  let payload: unknown;
-  try {
-    payload = rawBody ? JSON.parse(rawBody) : null;
-  } catch {
-    throw new Error(
-      `Nem sikerült feldolgozni a beszélgetés adatokat. Válasz: ${rawBody.slice(0, 200)}`
-    );
-  }
-
-  return normalizeConversations(payload);
-};
-
-const normalizeConversations = (payload: unknown): Conversation[] => {
-  const candidates = extractConversationArray(payload);
-
-  return candidates.map((chat, index) => {
-    const messages = extractMessages(chat?.messages ?? chat?.history ?? chat?.conversation);
-    const createdAt =
-      parseDate(chat?.createdAt ?? chat?.created_at ?? messages[0]?.timestamp) ?? new Date();
-    const lastMessageAt =
-      parseDate(chat?.lastMessageAt ?? chat?.updated_at ?? messages[messages.length - 1]?.timestamp) ??
-      createdAt;
-
-    return {
-      id: ensureString(chat?.id, `chat-${index}`),
-      title: ensureString(chat?.title, `Beszélgetés ${index + 1}`),
-      messages,
-      createdAt,
-      lastMessageAt,
-      messageCount: messages.length,
-      status: normalizeStatus(chat?.status),
-    };
-  });
-};
-
-const extractConversationArray = (payload: unknown): RemoteConversationShape[] => {
-  if (Array.isArray(payload)) {
-    return payload.filter(isRemoteConversation);
-  }
-  if (payload && typeof payload === "object") {
-    const obj = payload as Record<string, unknown>;
-    const candidates = ["chats", "data", "items"] as const;
-    for (const key of candidates) {
-      const maybeList = obj[key];
-      if (Array.isArray(maybeList)) {
-        return maybeList.filter(isRemoteConversation);
-      }
-    }
-  }
-  return [];
-};
-
-const extractMessages = (rawMessages: RemoteMessageShape[] | undefined): Message[] => {
-  if (!Array.isArray(rawMessages)) {
-    return [];
-  }
-
-  return rawMessages.map((msg, index) => {
-    const content = ensureString(msg.content ?? msg.message ?? "", "");
-    const timestamp =
-      parseDate(msg.timestamp ?? msg.createdAt ?? msg.created_at) ??
-      new Date();
-    const senderRaw = ensureString(msg.sender ?? msg.role, "user").toLowerCase();
-
-    return {
-      id: ensureString(msg.id, `message-${index}`),
-      content,
-      sender: senderRaw === "bot" || senderRaw === "assistant" ? "bot" : "user",
-      timestamp,
-    };
-  });
-};
-
-const parseDate = (value: unknown): Date | null => {
-  if (value instanceof Date) return value;
-  if (typeof value === "string" || typeof value === "number") {
-    const parsed = new Date(value);
-    if (!Number.isNaN(parsed.getTime())) {
-      return parsed;
-    }
-  }
-  return null;
-};
-
-const ensureString = (value: unknown, fallback: string): string => {
-  if (typeof value === "string" && value.trim().length > 0) {
-    return value;
-  }
-  return fallback;
-};
-
-const normalizeStatus = (status: unknown): Conversation["status"] => {
-  if (typeof status !== "string") return "completed";
-  const normalized = status.toLowerCase();
-  if (normalized.includes("active")) return "active";
-  if (normalized.includes("archiv")) return "archived";
-  return "completed";
-};
-
-const isRemoteConversation = (value: unknown): value is RemoteConversationShape =>
-  typeof value === "object" && value !== null;

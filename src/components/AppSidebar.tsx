@@ -67,8 +67,8 @@ const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <Image src="/simplyfire.png" alt="logo" width={20} height={20} />
-                <span>SF admin oldal</span>
+                {/* <Image src="/simplyfire.png" alt="logo" width={20} height={20} /> */}
+                <span>Noilézer admin oldal</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -190,7 +190,7 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup> */}
       </SidebarContent>
-      <SidebarFooter>
+     {/*  <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -208,7 +208,7 @@ const AppSidebar = () => {
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   );
 };
