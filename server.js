@@ -11,9 +11,12 @@ const port = 4200;
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
+const keyPath = process.env.SSL_KEY || path.join(__dirname, 'certs/localhost-key.pem');
+const certPath = process.env.SSL_CERT || path.join(__dirname, 'certs/localhost.pem');
+
 const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, 'certs/localhost-key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.pem')),
+  key: fs.readFileSync(keyPath),
+  cert: fs.readFileSync(certPath),
 };
 
 app.prepare().then(() => {
