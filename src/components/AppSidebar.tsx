@@ -1,17 +1,8 @@
-import {
-  Home,
-  Inbox,
-
-  User2,
-  ChevronUp,
-
-} from "lucide-react";
+import { Home, Inbox } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -19,17 +10,9 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-
   SidebarSeparator,
 } from "./ui/sidebar";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 
 const items = [
   {
@@ -190,7 +173,7 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup> */}
       </SidebarContent>
-     {/*  <SidebarFooter>
+      {/*  <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
