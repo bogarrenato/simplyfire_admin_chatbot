@@ -27,7 +27,8 @@ export const login = async (credential: string): Promise<LoginResponse> => {
     }
 
     return { success: false, message: "Bejelentkezési hiba történt" };
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error(error);
     return { success: false, message: "Hálózati hiba történt" };
   }
 };
@@ -38,7 +39,8 @@ export const logout = async (): Promise<void> => {
       method: "POST",
       credentials: "include",
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error(error);
     // Ignore errors
   } finally {
     localStorage.removeItem(AUTH_STORAGE_KEY);

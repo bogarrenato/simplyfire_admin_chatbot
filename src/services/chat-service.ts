@@ -1,10 +1,4 @@
-import type {
-  Conversation,
-  RemoteConversationShape,
-  RemoteMessageShape,
-  Message,
-  ConversationStatus,
-} from "@/types/chat";
+import type { Conversation, Message, ConversationStatus } from "@/types/chat";
 
 const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
 
@@ -52,7 +46,10 @@ export const fetchConversationsPage = async (
     payload = rawBody ? JSON.parse(rawBody) : null;
   } catch {
     throw new Error(
-      `Nem sikerült feldolgozni a beszélgetés adatokat. Válasz: ${rawBody.slice(0, 200)}`
+      `Nem sikerült feldolgozni a beszélgetés adatokat. Válasz: ${rawBody.slice(
+        0,
+        200
+      )}`
     );
   }
 
@@ -63,12 +60,15 @@ const normalizeChatsResponse = (
   payload: unknown,
   page: number
 ): ChatPageResponse => {
-  const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : {};
-  
+  const record =
+    payload && typeof payload === "object"
+      ? (payload as Record<string, unknown>)
+      : {};
+
   // Parse the data field which is a JSON string
   const dataString = typeof record.data === "string" ? record.data : "[]";
   let messagesData: unknown[] = [];
-  
+
   try {
     messagesData = JSON.parse(dataString);
   } catch (err) {
@@ -78,8 +78,9 @@ const normalizeChatsResponse = (
 
   // Convert messages array to conversations
   const conversations = normalizeMessagesToConversations(messagesData, page);
-  
-  const totalPages = typeof record.total_pages === "number" ? record.total_pages : 1;
+
+  const totalPages =
+    typeof record.total_pages === "number" ? record.total_pages : 1;
 
   return {
     conversations,
@@ -99,24 +100,34 @@ const normalizeMessagesToConversations = (
   // Group messages into conversations (each conversation starts with a user message)
   const conversations: Conversation[] = [];
   let currentMessages: Message[] = [];
-  let conversationStartIndex = 0;
 
   messages.forEach((msg, index) => {
     const message = normalizeMessage(msg, index);
-    
+
     // If this is a user message and we have previous messages, start a new conversation
     if (message.sender === "user" && currentMessages.length > 0) {
-      conversations.push(createConversationFromMessages(currentMessages, page, conversations.length));
+      conversations.push(
+        createConversationFromMessages(
+          currentMessages,
+          page,
+          conversations.length
+        )
+      );
       currentMessages = [];
-      conversationStartIndex = index;
     }
-    
+
     currentMessages.push(message);
   });
 
   // Add the last conversation
   if (currentMessages.length > 0) {
-    conversations.push(createConversationFromMessages(currentMessages, page, conversations.length));
+    conversations.push(
+      createConversationFromMessages(
+        currentMessages,
+        page,
+        conversations.length
+      )
+    );
   }
 
   return conversations;
@@ -129,10 +140,12 @@ const createConversationFromMessages = (
 ): Conversation => {
   const firstMessage = messages[0];
   const lastMessage = messages[messages.length - 1];
-  
+
   // Generate title from first user message
-  const firstUserMessage = messages.find(m => m.sender === "user");
-  const title = firstUserMessage?.content.slice(0, 50) || `Beszélgetés ${page}-${index + 1}`;
+  const firstUserMessage = messages.find((m) => m.sender === "user");
+  const title =
+    firstUserMessage?.content.slice(0, 50) ||
+    `Beszélgetés ${page}-${index + 1}`;
 
   return {
     id: `conversation-${page}-${index}`,
@@ -146,14 +159,16 @@ const createConversationFromMessages = (
 };
 
 const normalizeMessage = (msg: unknown, index: number): Message => {
-  const record = msg && typeof msg === "object" ? (msg as Record<string, unknown>) : {};
-  
+  const record =
+    msg && typeof msg === "object" ? (msg as Record<string, unknown>) : {};
+
   const content = typeof record.content === "string" ? record.content : "";
-  const role = typeof record.role === "string" ? record.role.toLowerCase() : "user";
-  
+  const role =
+    typeof record.role === "string" ? record.role.toLowerCase() : "user";
+
   // Convert role to sender: "user" -> "user", "system" -> "bot"
   const sender: "user" | "bot" = role === "system" ? "bot" : "user";
-  
+
   return {
     id: `message-${index}`,
     content,
@@ -169,97 +184,3 @@ export const fetchConversations = async (
   const response = await fetchConversationsPage(1, signal);
   return response.conversations;
 };
-
-const normalizeConversations = (payload: unknown): Conversation[] => {
-  const candidates = extractConversationArray(payload);
-
-  return candidates.map((chat, index) => {
-    const messages = extractMessages(chat?.messages ?? chat?.history ?? chat?.conversation);
-    const createdAt =
-      parseDate(chat?.createdAt ?? chat?.created_at ?? messages[0]?.timestamp) ?? new Date();
-    const lastMessageAt =
-      parseDate(chat?.lastMessageAt ?? chat?.updated_at ?? messages[messages.length - 1]?.timestamp) ??
-      createdAt;
-
-    return {
-      id: ensureString(chat?.id, `chat-${index}`),
-      title: ensureString(chat?.title, `Beszélgetés ${index + 1}`),
-      messages,
-      createdAt,
-      lastMessageAt,
-      messageCount: messages.length,
-      status: normalizeStatus(chat?.status),
-    };
-  });
-};
-
-const extractConversationArray = (payload: unknown): RemoteConversationShape[] => {
-  if (Array.isArray(payload)) {
-    return payload.filter(isRemoteConversation);
-  }
-  if (payload && typeof payload === "object") {
-    const obj = payload as Record<string, unknown>;
-    const candidates = ["chats", "data", "items"] as const;
-    for (const key of candidates) {
-      const maybeList = obj[key];
-      if (Array.isArray(maybeList)) {
-        return maybeList.filter(isRemoteConversation);
-      }
-    }
-  }
-  return [];
-};
-
-const extractMessages = (rawMessages: RemoteMessageShape[] | undefined): Message[] => {
-  if (!Array.isArray(rawMessages)) {
-    return [];
-  }
-
-  return rawMessages.map((msg, index) => {
-    const content = ensureString(msg.content ?? msg.message ?? "", "");
-    const timestamp =
-      parseDate(msg.timestamp ?? msg.createdAt ?? msg.created_at) ??
-      new Date();
-    const senderRaw = ensureString(msg.sender ?? msg.role, "user").toLowerCase();
-
-    return {
-      id: ensureString(msg.id, `message-${index}`),
-      content,
-      sender: senderRaw === "bot" || senderRaw === "assistant" ? "bot" : "user",
-      timestamp,
-    };
-  });
-};
-
-const parseDate = (value: unknown): Date | null => {
-  if (value instanceof Date) return value;
-  if (typeof value === "string" || typeof value === "number") {
-    const parsed = new Date(value);
-    if (!Number.isNaN(parsed.getTime())) {
-      return parsed;
-    }
-  }
-  return null;
-};
-
-const ensureString = (value: unknown, fallback: string): string => {
-  if (typeof value === "string" && value.trim().length > 0) {
-    return value;
-  }
-  return fallback;
-};
-
-const normalizeStatus = (status: unknown): ConversationStatus => {
-  if (typeof status !== "string") return "completed";
-  const normalized = status.toLowerCase();
-  if (normalized.includes("active")) return "active";
-  if (normalized.includes("archiv")) return "archived";
-  return "completed";
-};
-
-const isRemoteConversation = (value: unknown): value is RemoteConversationShape =>
-  typeof value === "object" && value !== null;
-
-
-
-
