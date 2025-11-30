@@ -32,9 +32,19 @@ export const fetchUsageMetrics = async (
   const response = await fetch(`${USAGE_API_BASE_URL}?${params.toString()}`, {
     method: "GET",
     headers: { Accept: "application/json" },
+    credentials: "include", // Send session cookies
     cache: "no-store",
     signal,
   });
+
+  if (response.status === 401) {
+    // Authentication required - trigger login modal
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("auth:required");
+      window.dispatchEvent(event);
+    }
+    throw new Error("Authentication required");
+  }
 
   if (!response.ok) {
     throw new Error(`Usage API responded with ${response.status}`);
@@ -179,9 +189,19 @@ export const fetchUsageStats = async (
   const response = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
+    credentials: "include", // Send session cookies
     cache: "no-store",
     signal,
   });
+
+  if (response.status === 401) {
+    // Authentication required - trigger login modal
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("auth:required");
+      window.dispatchEvent(event);
+    }
+    throw new Error("Authentication required");
+  }
 
   if (!response.ok) {
     throw new Error(`Usage Stats API responded with ${response.status}`);

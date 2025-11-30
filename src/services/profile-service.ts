@@ -30,12 +30,22 @@ export const fetchProfile = async (signal?: AbortSignal): Promise<UserProfile> =
   const response = await fetch(PROFILE_ENDPOINT, {
     method: "GET",
     headers: { Accept: "application/json" },
+    credentials: "include", // Send session cookies for consistency
     cache: "no-store",
     signal,
   });
 
   const text = await response.text();
   console.log("Profile API response:", text);
+
+  if (response.status === 401) {
+    // Authentication required - trigger login modal
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("auth:required");
+      window.dispatchEvent(event);
+    }
+    throw new Error("Authentication required");
+  }
 
   if (!response.ok) {
     throw new Error(text || `Profile API error: ${response.status}`);

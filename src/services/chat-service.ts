@@ -27,11 +27,21 @@ export const fetchConversationsPage = async (
   const response = await fetch(`${CHATS_ENDPOINT}?page=${page}`, {
     method: "GET",
     headers: { Accept: "application/json" },
+    credentials: "include", // Send session cookies
     cache: "no-store",
     signal,
   });
 
   const rawBody = await response.text();
+
+  if (response.status === 401) {
+    // Authentication required - trigger login modal
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("auth:required");
+      window.dispatchEvent(event);
+    }
+    throw new Error("Authentication required");
+  }
 
   if (!response.ok) {
     throw new Error(rawBody || `Sikertelen válasz: ${response.status}`);
