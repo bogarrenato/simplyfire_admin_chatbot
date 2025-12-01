@@ -129,7 +129,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+      <DialogContent className="max-w-4xl h-[80vh] flex flex-col overflow-hidden">
         <DialogHeader className="shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex-1">
@@ -163,7 +163,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
           </div>
         </DialogHeader>
 
-        <ScrollArea ref={scrollAreaRef} className="flex-1 mt-4">
+        <ScrollArea ref={scrollAreaRef} className="flex-1 mt-4 min-h-0 overflow-hidden">
           <div className="space-y-4 pr-4">
             {conversation.messages.map((message) => (
               <div
@@ -185,7 +185,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                         <Bot className="h-5 w-5 text-primary-foreground" />
                       )}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-1">
                         <span className={`text-sm font-medium ${
                           message.sender === "user" ? "text-foreground" : "text-primary-foreground"
@@ -198,7 +198,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                           {format(message.timestamp, "HH:mm", { locale: hu })}
                         </span>
                       </div>
-                      <div className={`whitespace-pre-wrap text-sm ${
+                      <div className={`whitespace-pre-wrap break-words text-sm ${
                         message.sender === "user" ? "text-foreground" : "text-primary-foreground"
                       }`}>
                         {renderMessageContent(message.content)}
