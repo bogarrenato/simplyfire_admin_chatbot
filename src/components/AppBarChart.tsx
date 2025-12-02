@@ -60,21 +60,23 @@ const AppBarChart = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
         <h1 className="text-lg font-medium">Párbeszédek száma</h1>
-        <div className="flex items-center space-x-2">
-          <div className="flex space-x-1 flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
+          <div className="flex flex-wrap gap-2">
             {quickRanges.map((range) => (
               <Button
                 key={range.days}
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickRange(range.days)}
-                className="text-xs"
+                className="text-xs flex-1 sm:flex-initial min-w-0"
               >
                 {range.label}
               </Button>
             ))}
+          </div>
+          <div className="w-full sm:w-auto">
             <DateRangePicker onDateRangeChange={handleDateRangeChange} />
           </div>
         </div>

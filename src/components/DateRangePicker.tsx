@@ -56,46 +56,63 @@ export default function DateRangePicker({ onDateRangeChange, className }: DateRa
         <Button
           variant="outline"
           className={cn(
-            "w-full max-w-[280px] justify-start text-left font-normal text-sm",
+            "w-full sm:max-w-[280px] justify-start text-left font-normal text-sm",
             !startDate && "text-muted-foreground",
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {formatDateRange()}
+          <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">{formatDateRange()}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 max-w-[95vw] sm:max-w-[400px]" align="start" side="bottom">
-        <div className="p-3">
-          <div className="space-y-3">
-            <div>
-              <h4 className="font-medium text-sm mb-2">Kezdő dátum kiválasztása</h4>
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={handleDateSelect}
-                className="rounded-md border w-full"
-                locale={hu}
-              />
-            </div>
-            {startDate && (
+      <PopoverContent 
+        className="w-[calc(100vw-2rem)] p-0 sm:w-auto sm:max-w-[95vw] md:max-w-[600px]" 
+        align="start" 
+        side="bottom"
+      >
+        <div className="p-3 sm:p-4">
+          <div className="space-y-3 sm:space-y-4">
+            {/* Mobile: Single column, Desktop: Two columns side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <h4 className="font-medium text-sm mb-2">Végdátum kiválasztása</h4>
+                <h4 className="font-medium text-sm mb-2">Kezdő dátum kiválasztása</h4>
                 <Calendar
                   mode="single"
-                  selected={endDate}
+                  selected={startDate}
                   onSelect={handleDateSelect}
                   className="rounded-md border w-full"
-                  disabled={(date) => date < startDate}
                   locale={hu}
                 />
               </div>
-            )}
-            <div className="flex justify-end space-x-2 pt-2">
-              <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>
+              {startDate && (
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Végdátum kiválasztása</h4>
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={handleDateSelect}
+                    className="rounded-md border w-full"
+                    disabled={(date) => date < startDate}
+                    locale={hu}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2 pt-2 border-t">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsOpen(false)}
+                className="w-full sm:w-auto"
+              >
                 Mégse
               </Button>
-              <Button size="sm" onClick={handleApply} disabled={!startDate || !endDate}>
+              <Button 
+                size="sm" 
+                onClick={handleApply} 
+                disabled={!startDate || !endDate}
+                className="w-full sm:w-auto"
+              >
                 Alkalmaz
               </Button>
             </div>
