@@ -20,12 +20,18 @@ const AppBarChart = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchUsageStats(startDate, endDate, controller.signal);
+        const data = await fetchUsageStats(
+          startDate,
+          endDate,
+          controller.signal
+        );
         setStats(data);
       } catch (err) {
         if ((err as Error)?.name === "AbortError") return;
         console.error("Failed to load usage stats", err);
-        setError("Nem sikerült betölteni a párbeszédek adatait. Próbáld újra később.");
+        setError(
+          "Nem sikerült betölteni a párbeszédek adatait. Próbáld újra később."
+        );
         setStats(null);
       } finally {
         if (!controller.signal.aborted) {
@@ -48,8 +54,6 @@ const AppBarChart = () => {
   const quickRanges = [
     { label: "Elmúlt 7 nap", days: 7 },
     { label: "Elmúlt 30 nap", days: 30 },
-    { label: "Elmúlt 90 nap", days: 90 },
-    { label: "Elmúlt év", days: 365 },
   ];
 
   const handleQuickRange = (days: number) => {
