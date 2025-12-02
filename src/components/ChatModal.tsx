@@ -74,9 +74,10 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
     }
   };
 
-  // Render helpers: support basic markdown links [text](url) and bare URL linkification
-  const createAnchor = (href: string, text: string) => (
+  // Render helpers: support basic markdown links [text](url), bare URL linkification, and bold **text**
+  const createAnchor = (href: string, text: string, key: string | number) => (
     <a
+      key={key}
       href={href}
       target="_blank"
       rel="noopener noreferrer"
@@ -86,44 +87,125 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
     </a>
   );
 
-  const linkifyUrls = (text: string): Array<string | React.ReactElement> => {
+  const createBold = (text: string, key: string | number) => (
+    <strong key={key} className="font-bold">
+      {text}
+    </strong>
+  );
+
+  const processBold = (text: string, baseKey: string = ""): Array<string | React.ReactElement> => {
+    const boldRegex = /\*\*([^*]+)\*\*/g;
+    const parts: Array<string | React.ReactElement> = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    let boldIndex = 0;
+    
+    while ((match = boldRegex.exec(text)) !== null) {
+      // Add text before the bold match
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      // Add the bold text
+      const boldText = match[1];
+      parts.push(createBold(boldText, `${baseKey}-bold-${boldIndex++}`));
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text after last bold match
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+    
+    // If no bold matches found, return the original text
+    if (parts.length === 0) {
+      return [text];
+    }
+    
+    return parts;
+  };
+
+  const linkifyUrls = (text: string, baseKey: string = ""): Array<string | React.ReactElement> => {
     const urlRegex = /https?:\/\/[^\s)]+/g;
     const parts: Array<string | React.ReactElement> = [];
     let lastIndex = 0;
     let match: RegExpExecArray | null;
+    let linkIndex = 0;
+    
     while ((match = urlRegex.exec(text)) !== null) {
       const url = match[0];
+      // Process text before URL (including bold formatting)
       if (match.index > lastIndex) {
-        parts.push(text.slice(lastIndex, match.index));
+        const precedingText = text.slice(lastIndex, match.index);
+        parts.push(...processBold(precedingText, `${baseKey}-pre-url-${linkIndex}`));
       }
-      parts.push(createAnchor(url, url));
+      parts.push(createAnchor(url, url, `${baseKey}-url-${linkIndex++}`));
       lastIndex = match.index + url.length;
     }
+    
+    // Process remaining text after last URL (including bold formatting)
     if (lastIndex < text.length) {
-      parts.push(text.slice(lastIndex));
+      const remainingText = text.slice(lastIndex);
+      parts.push(...processBold(remainingText, `${baseKey}-post-url`));
     }
-    return parts as Array<string | React.ReactElement>;
+    
+    // If no URLs found, process the whole text for bold formatting
+    if (parts.length === 0) {
+      return processBold(text, baseKey);
+    }
+    
+    return parts;
   };
 
-  const renderMessageContent = (text: string): Array<string | React.ReactElement> => {
+  const renderMessageContent = (text: string, messageId: string): Array<string | React.ReactElement> => {
     const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
     const nodes: Array<string | React.ReactElement> = [] as Array<string | React.ReactElement>;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
+    let linkIndex = 0;
+    
+    // First, process markdown links [text](url)
     while ((match = mdLinkRegex.exec(text)) !== null) {
       const preceding = text.slice(lastIndex, match.index);
+      // Process preceding text (handles bold and bare URLs)
       if (preceding) {
-        nodes.push(...(linkifyUrls(preceding) as Array<string | React.ReactElement>));
+        nodes.push(...(linkifyUrls(preceding, `${messageId}-pre-${linkIndex}`) as Array<string | React.ReactElement>));
       }
+      // Add the markdown link
       const label = match[1];
       const url = match[2];
-      nodes.push(createAnchor(url, label));
+      // Process label for bold formatting (in case label contains **text**)
+      const labelParts = processBold(label, `${messageId}-mdlink-label-${linkIndex}`);
+      if (labelParts.length === 1 && typeof labelParts[0] === "string") {
+        // Simple label, no bold formatting
+        nodes.push(createAnchor(url, label, `${messageId}-mdlink-${linkIndex++}`));
+      } else {
+        // Label has bold formatting, wrap in anchor
+        nodes.push(
+          <a
+            key={`${messageId}-mdlink-${linkIndex++}`}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-primary hover:opacity-80"
+          >
+            {labelParts}
+          </a>
+        );
+      }
       lastIndex = mdLinkRegex.lastIndex;
     }
+    
+    // Process remaining text after last markdown link (handles bold and bare URLs)
     const tail = text.slice(lastIndex);
     if (tail) {
-      nodes.push(...(linkifyUrls(tail) as Array<string | React.ReactElement>));
+      nodes.push(...(linkifyUrls(tail, `${messageId}-tail`) as Array<string | React.ReactElement>));
     }
+    
+    // If no markdown links found, process entire text for bold and URLs
+    if (nodes.length === 0) {
+      return linkifyUrls(text, messageId);
+    }
+    
     return nodes;
   };
 
@@ -201,7 +283,7 @@ const ChatModal = ({ conversation, onClose }: ChatModalProps) => {
                       <div className={`whitespace-pre-wrap break-words text-sm ${
                         message.sender === "user" ? "text-foreground" : "text-primary-foreground"
                       }`}>
-                        {renderMessageContent(message.content)}
+                        {renderMessageContent(message.content, message.id)}
                       </div>
                     </div>
                   </div>
