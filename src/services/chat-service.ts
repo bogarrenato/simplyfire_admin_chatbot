@@ -91,8 +91,11 @@ const normalizeChatsResponse = (
       // Each chat file represents a single conversation
       // Convert all messages in this chat file to a single conversation
       if (Array.isArray(messagesData) && messagesData.length > 0) {
+        // Parse timestamp from chatId (filename is a timestamp)
+        const chatTimestamp = parseTimestampFromChatId(chatObj.id);
+        
         const messages = messagesData.map((msg, msgIndex) => 
-          normalizeMessage(msg, msgIndex)
+          normalizeMessage(msg, msgIndex, chatTimestamp)
         );
         
         if (messages.length > 0) {
@@ -100,7 +103,8 @@ const normalizeChatsResponse = (
             messages,
             page,
             allConversations.length,
-            chatObj.id || `chat-${chatIndex}`
+            chatObj.id || `chat-${chatIndex}`,
+            chatTimestamp
           );
           allConversations.push(conversation);
         }
@@ -148,8 +152,11 @@ const normalizeMessagesToConversations = (
   const conversations: Conversation[] = [];
   let currentMessages: Message[] = [];
 
+  // Parse timestamp from chatId for legacy format
+  const chatTimestamp = parseTimestampFromChatId(chatId);
+
   messages.forEach((msg, index) => {
-    const message = normalizeMessage(msg, index);
+    const message = normalizeMessage(msg, index, chatTimestamp);
 
     // If this is a user message and we have previous messages, start a new conversation
     if (message.sender === "user" && currentMessages.length > 0) {
@@ -158,7 +165,8 @@ const normalizeMessagesToConversations = (
           currentMessages,
           page,
           conversations.length,
-          chatId
+          chatId,
+          chatTimestamp
         )
       );
       currentMessages = [];
@@ -174,7 +182,8 @@ const normalizeMessagesToConversations = (
         currentMessages,
         page,
         conversations.length,
-        chatId
+        chatId,
+        chatTimestamp
       )
     );
   }
@@ -186,7 +195,8 @@ const createConversationFromMessages = (
   messages: Message[],
   page: number,
   index: number,
-  chatId?: string
+  chatId?: string,
+  chatTimestamp?: Date
 ): Conversation => {
   const firstMessage = messages[0];
   const lastMessage = messages[messages.length - 1];
@@ -202,18 +212,94 @@ const createConversationFromMessages = (
     ? `${chatId}-conv-${index}` 
     : `conversation-${page}-${index}`;
 
+  // Use chatTimestamp if available, otherwise use message timestamps
+  const createdAt = chatTimestamp || firstMessage.timestamp;
+  const lastMessageAt = chatTimestamp || lastMessage.timestamp;
+
   return {
     id,
     title: title.length > 50 ? `${title}...` : title,
     messages,
-    createdAt: firstMessage.timestamp,
-    lastMessageAt: lastMessage.timestamp,
+    createdAt,
+    lastMessageAt,
     messageCount: messages.length,
     status: "completed" as ConversationStatus,
   };
 };
 
-const normalizeMessage = (msg: unknown, index: number): Message => {
+/**
+ * Parses timestamp from chatId (filename).
+ * Backend format: str(time.time()).replace('.', '') 
+ * Example: time.time() = 1733160123.456789 -> "1733160123456789"
+ * This is seconds (10 digits) + fractional seconds (variable digits) concatenated.
+ * 
+ * Python time.time() returns seconds since epoch as a float.
+ * The fractional part represents microseconds/milliseconds.
+ */
+const parseTimestampFromChatId = (chatId?: string): Date | undefined => {
+  if (!chatId) return undefined;
+  
+  // Try to parse as number
+  const numericId = parseInt(chatId, 10);
+  if (isNaN(numericId)) return undefined;
+  
+  const length = chatId.length;
+  
+  // If it's exactly 10 digits, it's seconds (no fractional part)
+  if (length === 10) {
+    return new Date(numericId * 1000);
+  }
+  
+  // If it's 13 digits, it's seconds (10) + milliseconds (3)
+  if (length === 13) {
+    const seconds = parseInt(chatId.substring(0, 10), 10);
+    const milliseconds = parseInt(chatId.substring(10, 13), 10);
+    return new Date(seconds * 1000 + milliseconds);
+  }
+  
+  // If it's 16 digits, it's seconds (10) + microseconds (6)
+  // Convert microseconds to milliseconds by dividing by 1000
+  if (length === 16) {
+    const seconds = parseInt(chatId.substring(0, 10), 10);
+    const microseconds = parseInt(chatId.substring(10, 16), 10);
+    return new Date(seconds * 1000 + Math.floor(microseconds / 1000));
+  }
+  
+  // If it's longer than 13 digits, try to extract seconds + fractional part
+  if (length > 13) {
+    const seconds = parseInt(chatId.substring(0, 10), 10);
+    const fractionalPart = parseInt(chatId.substring(10), 10);
+    // Assume the fractional part is in microseconds, convert to milliseconds
+    const fractionalLength = length - 10;
+    const divisor = Math.pow(10, fractionalLength - 3); // Convert to milliseconds
+    const milliseconds = Math.floor(fractionalPart / divisor);
+    return new Date(seconds * 1000 + milliseconds);
+  }
+  
+  // If it's between 11-12 digits, treat as seconds + partial milliseconds
+  if (length > 10 && length < 13) {
+    const seconds = parseInt(chatId.substring(0, 10), 10);
+    const partialMs = parseInt(chatId.substring(10), 10);
+    // Scale up to milliseconds (e.g., 2 digits -> multiply by 10, 1 digit -> multiply by 100)
+    const milliseconds = partialMs * Math.pow(10, 13 - length);
+    return new Date(seconds * 1000 + milliseconds);
+  }
+  
+  // If it's less than 10 digits, might be a different format
+  // Try as milliseconds directly if it looks like a millisecond timestamp
+  if (numericId > 1000000000000) {
+    return new Date(numericId);
+  }
+  
+  // Default: try as seconds
+  return new Date(numericId * 1000);
+};
+
+const normalizeMessage = (
+  msg: unknown, 
+  index: number, 
+  conversationTimestamp?: Date
+): Message => {
   const record =
     msg && typeof msg === "object" ? (msg as Record<string, unknown>) : {};
 
@@ -224,11 +310,14 @@ const normalizeMessage = (msg: unknown, index: number): Message => {
   // Convert role to sender: "user" -> "user", "system" -> "bot"
   const sender: "user" | "bot" = role === "system" ? "bot" : "user";
 
+  // Use conversation timestamp if available, otherwise use current time
+  const timestamp = conversationTimestamp || new Date();
+
   return {
     id: `message-${index}`,
     content,
     sender,
-    timestamp: new Date(), // API doesn't provide timestamp, use current time
+    timestamp,
   };
 };
 
