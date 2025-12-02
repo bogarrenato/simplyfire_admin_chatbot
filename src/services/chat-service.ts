@@ -3,9 +3,11 @@ import type { Conversation, Message, ConversationStatus } from "@/types/chat";
 const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
 
 export interface ChatsResponse {
-  data: string; // JSON string containing messages array
+  data: Array<{ id: string; data: string }> | string; // Array of chat objects (new format) or JSON string (legacy)
   page: number;
   total_pages: number;
+  total_chats?: number;
+  page_size?: number;
 }
 
 export interface ChatPageResponse {
@@ -65,25 +67,69 @@ const normalizeChatsResponse = (
       ? (payload as Record<string, unknown>)
       : {};
 
-  // Parse the data field which is a JSON string
-  const dataString = typeof record.data === "string" ? record.data : "[]";
-  let messagesData: unknown[] = [];
+  let allConversations: Conversation[] = [];
 
-  try {
-    messagesData = JSON.parse(dataString);
-  } catch (err) {
-    console.error("Failed to parse data field:", err);
-    messagesData = [];
+  // Check if data is an array (new format) or a string (legacy format)
+  if (Array.isArray(record.data)) {
+    // New format: data is an array of chat objects, each with { id, data: "JSON string" }
+    const chatArray = record.data as Array<{ id?: string; data?: string }>;
+    
+    // Process each chat object in the array
+    chatArray.forEach((chatObj, chatIndex) => {
+      if (!chatObj || typeof chatObj !== "object") return;
+      
+      const chatDataString = typeof chatObj.data === "string" ? chatObj.data : "[]";
+      let messagesData: unknown[] = [];
+
+      try {
+        messagesData = JSON.parse(chatDataString);
+      } catch (err) {
+        console.error(`Failed to parse chat data at index ${chatIndex}:`, err);
+        return; // Skip this chat if parsing fails
+      }
+
+      // Each chat file represents a single conversation
+      // Convert all messages in this chat file to a single conversation
+      if (Array.isArray(messagesData) && messagesData.length > 0) {
+        const messages = messagesData.map((msg, msgIndex) => 
+          normalizeMessage(msg, msgIndex)
+        );
+        
+        if (messages.length > 0) {
+          const conversation = createConversationFromMessages(
+            messages,
+            page,
+            allConversations.length,
+            chatObj.id || `chat-${chatIndex}`
+          );
+          allConversations.push(conversation);
+        }
+      }
+    });
+  } else if (typeof record.data === "string") {
+    // Legacy format: data is a single JSON string containing all messages
+    const dataString = record.data;
+    let messagesData: unknown[] = [];
+
+    try {
+      messagesData = JSON.parse(dataString);
+    } catch (err) {
+      console.error("Failed to parse data field:", err);
+      messagesData = [];
+    }
+
+    // Convert messages array to conversations
+    allConversations = normalizeMessagesToConversations(messagesData, page);
+  } else {
+    // Unknown format, return empty
+    console.warn("Unknown data format in API response:", record.data);
   }
-
-  // Convert messages array to conversations
-  const conversations = normalizeMessagesToConversations(messagesData, page);
 
   const totalPages =
     typeof record.total_pages === "number" ? record.total_pages : 1;
 
   return {
-    conversations,
+    conversations: allConversations,
     currentPage: page,
     totalPages,
   };
@@ -91,7 +137,8 @@ const normalizeChatsResponse = (
 
 const normalizeMessagesToConversations = (
   messages: unknown[],
-  page: number
+  page: number,
+  chatId?: string
 ): Conversation[] => {
   if (!Array.isArray(messages) || messages.length === 0) {
     return [];
@@ -110,7 +157,8 @@ const normalizeMessagesToConversations = (
         createConversationFromMessages(
           currentMessages,
           page,
-          conversations.length
+          conversations.length,
+          chatId
         )
       );
       currentMessages = [];
@@ -125,7 +173,8 @@ const normalizeMessagesToConversations = (
       createConversationFromMessages(
         currentMessages,
         page,
-        conversations.length
+        conversations.length,
+        chatId
       )
     );
   }
@@ -136,7 +185,8 @@ const normalizeMessagesToConversations = (
 const createConversationFromMessages = (
   messages: Message[],
   page: number,
-  index: number
+  index: number,
+  chatId?: string
 ): Conversation => {
   const firstMessage = messages[0];
   const lastMessage = messages[messages.length - 1];
@@ -147,8 +197,13 @@ const createConversationFromMessages = (
     firstUserMessage?.content.slice(0, 50) ||
     `Beszélgetés ${page}-${index + 1}`;
 
+  // Use chatId if provided, otherwise generate a unique ID
+  const id = chatId 
+    ? `${chatId}-conv-${index}` 
+    : `conversation-${page}-${index}`;
+
   return {
-    id: `conversation-${page}-${index}`,
+    id,
     title: title.length > 50 ? `${title}...` : title,
     messages,
     createdAt: firstMessage.timestamp,
