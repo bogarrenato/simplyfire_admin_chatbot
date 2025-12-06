@@ -3,7 +3,10 @@ import type { Conversation, Message, ConversationStatus } from "@/types/chat";
 const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
 
 export interface ChatsResponse {
-  data: Array<{ id: string; data: string }> | string; // Array of chat objects (new format) or JSON string (legacy)
+  // Newest format: array of JSON strings, each representing a conversation
+  // Older format: array of objects with { id, data: "JSON string" }
+  // Legacy format: single JSON string
+  data: string[] | Array<{ id: string; data: string }> | string;
   page: number;
   total_pages: number;
   total_chats?: number;
@@ -71,45 +74,101 @@ const normalizeChatsResponse = (
 
   // Check if data is an array (new format) or a string (legacy format)
   if (Array.isArray(record.data)) {
-    // New format: data is an array of chat objects, each with { id, data: "JSON string" }
-    const chatArray = record.data as Array<{ id?: string; data?: string }>;
+    const dataArray = record.data;
     
-    // Process each chat object in the array
-    chatArray.forEach((chatObj, chatIndex) => {
-      if (!chatObj || typeof chatObj !== "object") return;
-      
-      const chatDataString = typeof chatObj.data === "string" ? chatObj.data : "[]";
-      let messagesData: unknown[] = [];
-
-      try {
-        messagesData = JSON.parse(chatDataString);
-      } catch (err) {
-        console.error(`Failed to parse chat data at index ${chatIndex}:`, err);
-        return; // Skip this chat if parsing fails
-      }
-
-      // Each chat file represents a single conversation
-      // Convert all messages in this chat file to a single conversation
-      if (Array.isArray(messagesData) && messagesData.length > 0) {
-        // Parse timestamp from chatId (filename is a timestamp)
-        const chatTimestamp = parseTimestampFromChatId(chatObj.id);
+    // Check if array elements are strings (newest format) or objects (older format)
+    if (dataArray.length > 0 && typeof dataArray[0] === "string") {
+      // NEWEST FORMAT: data is an array of JSON strings, each representing a conversation
+      // Example: ["[{...}]", "[{...}]", ...]
+      dataArray.forEach((chatDataString, chatIndex) => {
+        if (typeof chatDataString !== "string") return;
         
-        const messages = messagesData.map((msg, msgIndex) => 
-          normalizeMessage(msg, msgIndex, chatTimestamp)
-        );
-        
-        if (messages.length > 0) {
-          const conversation = createConversationFromMessages(
-            messages,
-            page,
-            allConversations.length,
-            chatObj.id || `chat-${chatIndex}`,
-            chatTimestamp
-          );
-          allConversations.push(conversation);
+        let messagesData: unknown[] = [];
+
+        try {
+          messagesData = JSON.parse(chatDataString);
+        } catch (err) {
+          console.error(`Failed to parse chat data at index ${chatIndex}:`, err);
+          return; // Skip this chat if parsing fails
         }
-      }
-    });
+
+        // Each string represents a single conversation with multiple messages
+        if (Array.isArray(messagesData) && messagesData.length > 0) {
+          // Generate a chat ID from index and page
+          const chatId = `chat-${page}-${chatIndex}`;
+          
+          // Try to extract timestamp from first message or use current time
+          const firstMessage = messagesData[0];
+          let chatTimestamp: Date | undefined;
+          
+          if (firstMessage && typeof firstMessage === "object") {
+            const msgRecord = firstMessage as Record<string, unknown>;
+            if (msgRecord.timestamp) {
+              chatTimestamp = new Date(msgRecord.timestamp as string | number);
+            }
+          }
+          
+          if (!chatTimestamp || isNaN(chatTimestamp.getTime())) {
+            chatTimestamp = new Date(); // Fallback to current time
+          }
+          
+          const messages = messagesData.map((msg, msgIndex) => 
+            normalizeMessage(msg, msgIndex, chatTimestamp)
+          );
+          
+          if (messages.length > 0) {
+            const conversation = createConversationFromMessages(
+              messages,
+              page,
+              allConversations.length,
+              chatId,
+              chatTimestamp
+            );
+            allConversations.push(conversation);
+          }
+        }
+      });
+    } else {
+      // OLDER FORMAT: data is an array of chat objects, each with { id, data: "JSON string" }
+      const chatArray = record.data as Array<{ id?: string; data?: string }>;
+      
+      // Process each chat object in the array
+      chatArray.forEach((chatObj, chatIndex) => {
+        if (!chatObj || typeof chatObj !== "object") return;
+        
+        const chatDataString = typeof chatObj.data === "string" ? chatObj.data : "[]";
+        let messagesData: unknown[] = [];
+
+        try {
+          messagesData = JSON.parse(chatDataString);
+        } catch (err) {
+          console.error(`Failed to parse chat data at index ${chatIndex}:`, err);
+          return; // Skip this chat if parsing fails
+        }
+
+        // Each chat file represents a single conversation
+        // Convert all messages in this chat file to a single conversation
+        if (Array.isArray(messagesData) && messagesData.length > 0) {
+          // Parse timestamp from chatId (filename is a timestamp)
+          const chatTimestamp = parseTimestampFromChatId(chatObj.id);
+          
+          const messages = messagesData.map((msg, msgIndex) => 
+            normalizeMessage(msg, msgIndex, chatTimestamp)
+          );
+          
+          if (messages.length > 0) {
+            const conversation = createConversationFromMessages(
+              messages,
+              page,
+              allConversations.length,
+              chatObj.id || `chat-${chatIndex}`,
+              chatTimestamp
+            );
+            allConversations.push(conversation);
+          }
+        }
+      });
+    }
   } else if (typeof record.data === "string") {
     // Legacy format: data is a single JSON string containing all messages
     const dataString = record.data;
