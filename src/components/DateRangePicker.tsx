@@ -10,22 +10,36 @@ import { DateRange } from "react-day-picker";
 
 interface DateRangePickerProps {
   onDateRangeChange: (startDate: Date, endDate: Date) => void;
+  startDate?: Date;
+  endDate?: Date;
   className?: string;
 }
 
-export default function DateRangePicker({ onDateRangeChange }: DateRangePickerProps) {
+export default function DateRangePicker({ 
+  onDateRangeChange, 
+  startDate: externalStartDate,
+  endDate: externalEndDate 
+}: DateRangePickerProps) {
   const today = new Date();
-  // Alapértelmezett érték: mai nap kezdete és vége
+  const initialStartDate = externalStartDate || today;
+  const initialEndDate = externalEndDate || today;
+  
+  // Alapértelmezett érték: külső prop-ból vagy mai nap
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: today,
-    to: today,
+    from: initialStartDate,
+    to: initialEndDate,
   });
   const [open, setOpen] = useState(false);
 
-  // Alapértelmezett érték küldése a szülő komponensnek komponens mountolásakor
+  // Szinkronizáljuk a külső dátum változásokat
   useEffect(() => {
-    onDateRangeChange(today, today);
-  }, []); // Üres dependency array = csak egyszer fut le mountoláskor
+    if (externalStartDate && externalEndDate) {
+      setDateRange({
+        from: externalStartDate,
+        to: externalEndDate,
+      });
+    }
+  }, [externalStartDate, externalEndDate]);
 
   const handleDateRangeSelect = (range: DateRange | undefined) => {
     setDateRange(range);

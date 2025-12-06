@@ -16,6 +16,7 @@ const AppBarChart = () => {
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date>(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [activeQuickRange, setActiveQuickRange] = useState<number | null>(30); // Alapértelmezetten 30 nap aktív
 
   useEffect(() => {
     const controller = new AbortController();
@@ -52,6 +53,35 @@ const AppBarChart = () => {
     const normalizedEnd = end >= start ? end : start;
     setStartDate(normalizedStart);
     setEndDate(normalizedEnd);
+    
+    // Ellenőrizzük, hogy egy quick range-e az új dátum
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startDateOnly = new Date(normalizedStart);
+    startDateOnly.setHours(0, 0, 0, 0);
+    const endDateOnly = new Date(normalizedEnd);
+    endDateOnly.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.round((endDateOnly.getTime() - startDateOnly.getTime()) / (1000 * 60 * 60 * 24));
+    const isToday = endDateOnly.getTime() === today.getTime();
+    
+    // Ellenőrizzük, hogy a kezdő dátum is megfelelő-e
+    const expectedStart7 = subDays(today, 6);
+    expectedStart7.setHours(0, 0, 0, 0);
+    const expectedStart30 = subDays(today, 29);
+    expectedStart30.setHours(0, 0, 0, 0);
+    
+    const startMatches7 = startDateOnly.getTime() === expectedStart7.getTime();
+    const startMatches30 = startDateOnly.getTime() === expectedStart30.getTime();
+    
+    if (diffDays === 6 && isToday && startMatches7) {
+      setActiveQuickRange(7);
+    } else if (diffDays === 29 && isToday && startMatches30) {
+      setActiveQuickRange(30);
+    } else {
+      setActiveQuickRange(null); // Egyedi dátum választás
+    }
   };
 
   const quickRanges = [
@@ -62,6 +92,7 @@ const AppBarChart = () => {
   const handleQuickRange = (days: number) => {
     const end = new Date();
     const start = subDays(end, days);
+    setActiveQuickRange(days); // Aktívvá tesszük a quick range gombot
     handleDateRangeChange(start, end);
   };
 
@@ -74,7 +105,7 @@ const AppBarChart = () => {
             {quickRanges.map((range) => (
               <Button
                 key={range.days}
-                variant="outline"
+                variant={activeQuickRange === range.days ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleQuickRange(range.days)}
                 className="text-xs flex-1 sm:flex-initial min-w-0"
@@ -84,7 +115,11 @@ const AppBarChart = () => {
             ))}
           </div>
           <div className="w-full sm:w-auto">
-            <DateRangePicker onDateRangeChange={handleDateRangeChange} />
+            <DateRangePicker 
+              onDateRangeChange={handleDateRangeChange}
+              startDate={startDate}
+              endDate={endDate}
+            />
           </div>
         </div>
       </div>
