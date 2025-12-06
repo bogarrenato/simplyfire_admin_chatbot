@@ -27,186 +27,26 @@ interface Conversation {
   status: "active" | "completed" | "archived";
 }
 
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    title: "Online jegyvásárlás és kedvezmények",
+// Próba beszélgetés generálása hiba vagy üres válasz esetén
+const createFallbackConversation = (): Conversation => {
+  const now = new Date();
+  return {
+    id: "fallback-1",
+    title: "próba cím",
     messages: [
       {
-        id: "1-1",
-        content: "Hogyan tudok online jegyet venni az Aqua-Palace Élményfürdőbe?",
+        id: "fallback-1-1",
+        content: "",
         sender: "user",
-        timestamp: new Date("2025-10-29T10:10:00")
-      },
-      {
-        id: "1-2",
-        content: "Az online jegyvásárlás elérhető a SF oldalán, az Online jegyvásárlás menüpontban. Online vásárlás esetén kedvezményt biztosítunk a belépőjegyek árjegyzéki árából. Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T10:10:20")
-      },
-    ],
-    createdAt: new Date("2025-10-29T10:10:00"),
-    lastMessageAt: new Date("2025-10-29T10:10:20"),
-    messageCount: 2,
-    status: "completed"
-  },
-  {
-    id: "2",
-    title: "Árak és belépőjegy csomagok",
-    messages: [
-      {
-        id: "2-1",
-        content: "Mennyibe kerül a családi jegy?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T11:00:00")
-      },
-      {
-        id: "2-2",
-        content: "A konkrét árak a SF Árak oldalán találhatók, a Belépőjegy csomagok szekcióban. Az árak szezonálisan és szolgáltatásonként eltérhetnek (Gyógyfürdő, Aqua-Palace, Strand, Aquapark, Prémium Zóna). Részletek az árak oldalon az alábbi linkre kattintva érhetők el: ÁRAK – https://hungarospa.hu/jegyarak/",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T11:00:20")
-      },
-      {
-        id: "2-3",
-        content: "Van kombinált jegy Aqua-Palace + Gyógyfürdőre?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T11:00:40")
-      },
-      {
-        id: "2-4",
-        content: "Igen, elérhető Aqua-Palace extra belépőjegy csomag, amely kedvezményes kombinációt kínál. Részletek az árak oldalon: [ÁRAK](https://hungarospa.hu/jegyarak/)",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T11:01:00")
+        timestamp: now
       }
     ],
-    createdAt: new Date("2025-10-29T11:00:00"),
-    lastMessageAt: new Date("2025-10-29T11:01:00"),
-    messageCount: 4,
+    createdAt: now,
+    lastMessageAt: now,
+    messageCount: 1,
     status: "completed"
-  },
-  {
-    id: "3",
-    title: "Nyitvatartás és szezonális egységek",
-    messages: [
-      {
-        id: "3-1",
-        content: "Nyitva van most az Aquapark?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T12:15:00")
-      },
-      {
-        id: "3-2",
-        content: "Az Aquapark jelenleg zárva. Egész évben nyitva: Aqua-Palace Élményfürdő, Gyógyfürdő, Árpád Uszoda. A Strand szezonálisan üzemel. Aktuális nyitvatartás: https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T12:15:20")
-      }
-    ],
-    createdAt: new Date("2025-10-29T12:15:00"),
-    lastMessageAt: new Date("2025-10-29T12:15:20"),
-    messageCount: 2,
-    status: "completed"
-  },
-  {
-    id: "4",
-    title: "Fizetési módok és kedvezmények",
-    messages: [
-      {
-        id: "4-1",
-        content: "Milyen fizetési módokat fogadnak el a pénztáraknál?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T13:05:00")
-      },
-      {
-        id: "4-2",
-        content: "A részletes információk a Fizetési módok menüpontban találhatók. Itt tájékozódhat a készpénz, bankkártya és egyéb elfogadott fizetési megoldásokról.",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T13:05:20")
-      },
-      {
-        id: "4-3",
-        content: "Vannak szezonális akciók vagy kedvezmények?",
-        sender: "user",
-        timestamp: new Date("2025-10-29T13:05:40")
-      },
-      {
-        id: "4-4",
-        content: "Igen, az Akciók oldalon rendszeresen frissülő ajánlatok érhetők el (például online jegyvásárlási kedvezmény, kombinált csomagok). Részletek: https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-29T13:05:55")
-      }
-    ],
-    createdAt: new Date("2025-10-29T13:05:00"),
-    lastMessageAt: new Date("2025-10-29T13:05:55"),
-    messageCount: 4,
-    status: "completed"
-  },
-  {
-    id: "5",
-    title: "SF Medical Center – labor akció",
-    messages: [
-      {
-        id: "5-1",
-        content: "Van most kedvezmény a laborvizsgálatokra a Medical Centerben?",
-        sender: "user",
-        timestamp: new Date("2025-10-30T09:00:00")
-      },
-      {
-        id: "5-2",
-        content: "Igen. Nyitási akció keretében minden laborcsomag 10% kedvezménnyel érhető el a SF Medical Center vérvételi pontján. További részletek: https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-30T09:00:25")
-      }
-    ],
-    createdAt: new Date("2025-10-30T09:00:00"),
-    lastMessageAt: new Date("2025-10-30T09:00:25"),
-    messageCount: 2,
-    status: "completed"
-  },
-  {
-    id: "6",
-    title: "Gyógykúra és szolgáltatások",
-    messages: [
-      {
-        id: "6-1",
-        content: "Mit tartalmaz a Gyógykúra élményfürdőzéssel akció?",
-        sender: "user",
-        timestamp: new Date("2025-10-30T09:20:00")
-      },
-      {
-        id: "6-2",
-        content: "A Hajdúszoboszlói Gyógyfürdő gyógykúra szolgáltatásai mellé az akció időtartama alatt élményfürdő belépő jár. A részletes feltételek és időtartam az Akciók oldalon található: https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-30T09:20:25")
-      }
-    ],
-    createdAt: new Date("2025-10-30T09:20:00"),
-    lastMessageAt: new Date("2025-10-30T09:20:25"),
-    messageCount: 2,
-    status: "completed"
-  },
-  {
-    id: "7",
-    title: "Parkolás és megközelítés",
-    messages: [
-      {
-        id: "7-1",
-        content: "Hol tudok parkolni és hogyan lehet a komplexumot megközelíteni?",
-        sender: "user",
-        timestamp: new Date("2025-10-30T09:40:00")
-      },
-      {
-        id: "7-2",
-        content: "A Parkolás és Megközelítés információk a honlapon találhatók, térképekkel és gyakorlati tudnivalókkal. Kérjük, ellenőrizze az aktuális részleteket indulás előtt: https://hungarospa.hu/",
-        sender: "bot",
-        timestamp: new Date("2025-10-30T09:40:20")
-      }
-    ],
-    createdAt: new Date("2025-10-30T09:40:00"),
-    lastMessageAt: new Date("2025-10-30T09:40:20"),
-    messageCount: 2,
-    status: "completed"
-  }
-];
+  };
+};
 
 const ChatConversations = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -226,8 +66,8 @@ const ChatConversations = () => {
       try {
         const response = await fetchConversationsPage(1, controller.signal);
         if (response.conversations.length === 0) {
-          setError("Nem érkezett beszélgetés adat, a mintapéldák láthatók.");
-          setConversations(mockConversations);
+          setError("Nem érkezett beszélgetés adat.");
+          setConversations([createFallbackConversation()]);
         } else {
           setConversations(response.conversations);
           setCurrentPage(response.currentPage);
@@ -239,7 +79,7 @@ const ChatConversations = () => {
           (err as Error)?.message ?? "Ismeretlen hiba történt a beszélgetések betöltése közben.";
         console.error("Failed to load chats:", err);
         setError(message);
-        setConversations(mockConversations);
+        setConversations([createFallbackConversation()]);
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
