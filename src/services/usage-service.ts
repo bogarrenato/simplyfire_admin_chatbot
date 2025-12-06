@@ -1,7 +1,7 @@
-import { formatISO } from "date-fns";
+import { formatISO, parseISO } from "date-fns";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
-import type { UsageBucket, UsageMetrics, UsageStats } from "@/types/usage";
+import type { UsageBucket, UsageMetrics, UsageStats, DailyUsage } from "@/types/usage";
 
 const USAGE_API_BASE_URL = "https://simplyfire.ai:5001/api/noilezer/usage";
 
@@ -215,9 +215,44 @@ export const fetchUsageStats = async (
   const conversationCount = readNumber(record.conversationCount) ?? 0;
   const messageCount = readNumber(record.messageCount) ?? 0;
 
+  // Feldolgozzuk a napi bontású adatokat
+  const dailyData: DailyUsage[] = [];
+  
+  // Végigmegyünk a rekord kulcsain és kinyerjük a dátumokat
+  Object.keys(record).forEach((key) => {
+    // Kihagyjuk az összesített mezőket
+    if (key === "conversationCount" || key === "messageCount") {
+      return;
+    }
+    
+    // Ellenőrizzük, hogy dátum formátumú-e (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (dateRegex.test(key)) {
+      const dayRecord = record[key];
+      if (isRecord(dayRecord)) {
+        const conversations = readNumber(dayRecord.new) ?? 0;
+        const messages = readNumber(dayRecord.total) ?? 0;
+        
+        dailyData.push({
+          date: key,
+          conversations,
+          messages,
+        });
+      }
+    }
+  });
+  
+  // Rendezzük dátum szerint növekvő sorrendben
+  dailyData.sort((a, b) => {
+    const dateA = parseISO(a.date);
+    const dateB = parseISO(b.date);
+    return dateA.getTime() - dateB.getTime();
+  });
+
   return {
     conversationCount,
     messageCount,
+    dailyData,
   };
 };
 

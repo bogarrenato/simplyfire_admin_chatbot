@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import DateRangePicker from "./DateRangePicker";
-import { subDays } from "date-fns";
+import { subDays, parseISO, format } from "date-fns";
+import { hu } from "date-fns/locale";
 import type { UsageStats } from "@/types/usage";
 import { fetchUsageStats } from "@/services/usage-service";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 const AppAreaChart = () => {
   const [stats, setStats] = useState<UsageStats | null>(null);
@@ -91,13 +94,71 @@ const AppAreaChart = () => {
       ) : error ? (
         <p className="text-sm text-destructive">{error}</p>
       ) : stats ? (
-        <div className="flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-4xl font-bold text-primary">
-              {stats.messageCount.toLocaleString()}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">Összes üzenet</p>
+        <div className="space-y-4">
+          {/* Összesített szám */}
+          <div className="flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-4xl font-bold text-primary">
+                {stats.messageCount.toLocaleString()}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">Összes üzenet</p>
+            </div>
           </div>
+          
+          {/* Napi bontású grafikon */}
+          {stats.dailyData && stats.dailyData.length > 0 && (
+            <div className="mt-6">
+              <ChartContainer
+                config={{
+                  messages: {
+                    label: "Üzenetek",
+                    color: "hsl(var(--chart-2))",
+                  },
+                }}
+                className="h-[300px] w-full"
+              >
+                <AreaChart
+                  data={stats.dailyData.map((day) => ({
+                    date: format(parseISO(day.date), "MMM dd", { locale: hu }),
+                    messages: day.messages,
+                  }))}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="colorMessages" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-messages)" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="var(--color-messages)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => value}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => value.toLocaleString()}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dot" />}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="messages"
+                    stroke="var(--color-messages)"
+                    fillOpacity={1}
+                    fill="url(#colorMessages)"
+                  />
+                </AreaChart>
+              </ChartContainer>
+            </div>
+          )}
         </div>
       ) : null}
     </div>

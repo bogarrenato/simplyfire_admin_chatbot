@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import DateRangePicker from "./DateRangePicker";
-import { subDays } from "date-fns";
+import { subDays, parseISO, format } from "date-fns";
+import { hu } from "date-fns/locale";
 import type { UsageStats } from "@/types/usage";
 import { fetchUsageStats } from "@/services/usage-service";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 const AppBarChart = () => {
   const [stats, setStats] = useState<UsageStats | null>(null);
@@ -91,15 +94,65 @@ const AppBarChart = () => {
       ) : error ? (
         <p className="text-sm text-destructive">{error}</p>
       ) : stats ? (
-        <div className="flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-4xl font-bold text-primary">
-              {stats.conversationCount.toLocaleString()}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Összes párbeszéd
-            </p>
+        <div className="space-y-4">
+          {/* Összesített szám */}
+          <div className="flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-4xl font-bold text-primary">
+                {stats.conversationCount.toLocaleString()}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Összes párbeszéd
+              </p>
+            </div>
           </div>
+          
+          {/* Napi bontású grafikon */}
+          {stats.dailyData && stats.dailyData.length > 0 && (
+            <div className="mt-6">
+              <ChartContainer
+                config={{
+                  conversations: {
+                    label: "Párbeszédek",
+                    color: "hsl(var(--chart-1))",
+                  },
+                }}
+                className="h-[300px] w-full"
+              >
+                <BarChart
+                  data={stats.dailyData.map((day) => ({
+                    date: format(parseISO(day.date), "MMM dd", { locale: hu }),
+                    conversations: day.conversations,
+                  }))}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => value}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => value.toLocaleString()}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dot" />}
+                  />
+                  <Bar
+                    dataKey="conversations"
+                    fill="var(--color-conversations)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          )}
         </div>
       ) : null}
     </div>
