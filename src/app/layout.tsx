@@ -21,7 +21,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Chatbot admin oldal",
   description: "",
-  // Favicon explicit kikapcsolása - nincs icons property, így Next.js nem generál favicon linket
 };
 
 export default function RootLayout({

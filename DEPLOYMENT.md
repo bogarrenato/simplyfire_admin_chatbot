@@ -21,7 +21,7 @@ A `npm run build` parancs után az **`out/`** mappa tartalmazza az összes stati
 
 1. **Forráskód mappák:**
    - `src/` - Teljes forráskód mappa (komponensek, oldalak, szolgáltatások, típusok)
-   - `public/` - Statikus fájlok (képek, favicon, stb.)
+   - `public/` - Statikus fájlok (képek, stb.)
 
 2. **Konfigurációs fájlok:**
    - `package.json` - Függőségek és scriptek definíciója

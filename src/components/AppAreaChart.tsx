@@ -56,28 +56,35 @@ const AppAreaChart = () => {
     
     // Ellenőrizzük, hogy egy quick range-e az új dátum
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(23, 59, 59, 999);
     
     const startDateOnly = new Date(normalizedStart);
     startDateOnly.setHours(0, 0, 0, 0);
     const endDateOnly = new Date(normalizedEnd);
-    endDateOnly.setHours(0, 0, 0, 0);
+    endDateOnly.setHours(23, 59, 59, 999);
     
-    const diffDays = Math.round((endDateOnly.getTime() - startDateOnly.getTime()) / (1000 * 60 * 60 * 24));
-    const isToday = endDateOnly.getTime() === today.getTime();
+    // Számoljuk ki a napok számát (inkluzív)
+    const diffDays = Math.round((endDateOnly.getTime() - startDateOnly.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Ellenőrizzük, hogy a végdátum ma van-e (nap szinten)
+    const todayOnly = new Date();
+    todayOnly.setHours(0, 0, 0, 0);
+    const endDateOnlyCheck = new Date(normalizedEnd);
+    endDateOnlyCheck.setHours(0, 0, 0, 0);
+    const isToday = endDateOnlyCheck.getTime() === todayOnly.getTime();
     
     // Ellenőrizzük, hogy a kezdő dátum is megfelelő-e
-    const expectedStart7 = subDays(today, 6);
+    const expectedStart7 = subDays(todayOnly, 6);
     expectedStart7.setHours(0, 0, 0, 0);
-    const expectedStart30 = subDays(today, 29);
+    const expectedStart30 = subDays(todayOnly, 29);
     expectedStart30.setHours(0, 0, 0, 0);
     
     const startMatches7 = startDateOnly.getTime() === expectedStart7.getTime();
     const startMatches30 = startDateOnly.getTime() === expectedStart30.getTime();
     
-    if (diffDays === 6 && isToday && startMatches7) {
+    if (diffDays === 7 && isToday && startMatches7) {
       setActiveQuickRange(7);
-    } else if (diffDays === 29 && isToday && startMatches30) {
+    } else if (diffDays === 30 && isToday && startMatches30) {
       setActiveQuickRange(30);
     } else {
       setActiveQuickRange(null); // Egyedi dátum választás
@@ -91,9 +98,12 @@ const AppAreaChart = () => {
 
   const handleQuickRange = (days: number) => {
     const end = new Date();
-    const start = subDays(end, days);
+    end.setHours(23, 59, 59, 999); // Végig a nap végéig
+    const start = subDays(end, days - 1);
+    start.setHours(0, 0, 0, 0); // A nap elejétől
+    setStartDate(start);
+    setEndDate(end);
     setActiveQuickRange(days); // Aktívvá tesszük a quick range gombot
-    handleDateRangeChange(start, end);
   };
 
   return (
@@ -147,7 +157,10 @@ const AppAreaChart = () => {
                 config={{
                   messages: {
                     label: "Üzenetek",
-                    color: "hsl(var(--chart-2))",
+                    theme: {
+                      light: "oklch(0.15 0.1 184.704)",
+                      dark: "hsl(0 0% 90%)",
+                    },
                   },
                 }}
                 className="h-[300px] w-full"
@@ -161,8 +174,8 @@ const AppAreaChart = () => {
                 >
                   <defs>
                     <linearGradient id="colorMessages" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-messages)" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="var(--color-messages)" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="var(--color-messages)" stopOpacity={1}/>
+                      <stop offset="95%" stopColor="var(--color-messages)" stopOpacity={0.3}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
