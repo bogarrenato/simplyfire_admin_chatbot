@@ -162,8 +162,29 @@ output: 'standalone'
 ## Production environment változók
 
 Ha szükségesek environment változók, ezeket a DevOps mérnöknek külön kell beállítania:
+
+### Build időben beállítandó változók (Next.js)
+
+A következő változókat a **build időben** kell beállítani (mert `NEXT_PUBLIC_` prefix-szel rendelkeznek és a build output-ba bekerülnek):
+
+- `NEXT_PUBLIC_USAGE_API_BASE_URL` - Usage API endpoint (alapértelmezett: `https://simplyfire.ai:5001/api/noilezer/usage`)
+- `NEXT_PUBLIC_MESSAGES_API_BASE_URL` - Messages/Chats API endpoint (alapértelmezett: `https://simplyfire.ai:5001/api/noilezer/chats`)
+
+**Példa build parancs environment változókkal:**
+```bash
+NEXT_PUBLIC_USAGE_API_BASE_URL=https://api.example.com/usage \
+NEXT_PUBLIC_MESSAGES_API_BASE_URL=https://api.example.com/chats \
+npm run build
+```
+
+### Runtime változók (ha Node.js szervert használsz)
+
 - `NODE_ENV=production`
 - `PORT=3000` (opcionális, alapértelmezett: 3000)
+- `SSL_KEY` - SSL kulcs fájl elérési útja (ha HTTPS-t használsz)
+- `SSL_CERT` - SSL tanúsítvány fájl elérési útja (ha HTTPS-t használsz)
+
+**Fontos:** Mivel a projekt statikus exportot generál, a `NEXT_PUBLIC_` változókat a **build időben** kell beállítani, mert ezek a build output-ba bekerülnek. Runtime-ban nem lehet őket megváltoztatni.
 
 ## Megjegyzések
 

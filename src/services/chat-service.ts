@@ -1,6 +1,6 @@
 import type { Conversation, Message, ConversationStatus } from "@/types/chat";
 
-const CHATS_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/chats";
+const MESSAGES_API_BASE_URL = process.env.MESSAGES_API_BASE_URL || "https://simplyfire.ai:5001/api/noilezer/chats";
 
 export interface ChatsResponse {
   // Newest format: array of objects with { id, data, date } - date is ISO string
@@ -24,7 +24,7 @@ export const fetchConversationsPage = async (
   page: number = 1,
   signal?: AbortSignal
 ): Promise<ChatPageResponse> => {
-  const response = await fetch(`${CHATS_ENDPOINT}?page=${page}`, {
+  const response = await fetch(`${MESSAGES_API_BASE_URL}?page=${page}`, {
     method: "GET",
     headers: { Accept: "application/json" },
     credentials: "include", // Send session cookies
