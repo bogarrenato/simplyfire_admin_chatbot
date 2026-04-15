@@ -82,6 +82,7 @@ export default function DateRangePicker({
       </PopoverTrigger>
       <PopoverContent className="p-0 w-auto max-w-[95vw] sm:max-w-[350px]" align="start" side="bottom">
         <Calendar
+          mode="range"
           selected={dateRange}
           onSelect={handleDateRangeSelect}
           locale={hu}
