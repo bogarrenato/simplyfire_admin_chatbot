@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import type { UsageBucket, UsageMetrics, UsageStats, DailyUsage } from "@/types/usage";
 
-const USAGE_API_BASE_URL = process.env.NEXT_PUBLIC_USAGE_API_BASE_URL || "https://simplyfire.ai:5001/api/noilezer/usage";
+const USAGE_API_BASE_URL = process.env.NEXT_PUBLIC_USAGE_API_BASE_URL || "https://simplyfire.ai/api/noilezer/usage";
 
 type UnknownRecord = Record<string, unknown>;
 type BucketCandidate = UnknownRecord & {

@@ -1,5 +1,5 @@
 const AUTH_STORAGE_KEY = "auth_authenticated";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://simplyfire.ai:5001/api/noilezer";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://simplyfire.ai/api/noilezer";
 
 export interface LoginResponse {
   success: boolean;

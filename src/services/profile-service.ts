@@ -1,6 +1,6 @@
 import type { UserProfile } from "@/types/profile";
 
-const PROFILE_ENDPOINT = "https://simplyfire.ai:5001/api/noilezer/profile";
+const PROFILE_ENDPOINT = "https://simplyfire.ai/api/noilezer/profile";
 
 export const PROFILE_FALLBACK: UserProfile = {
   id: "user_123",

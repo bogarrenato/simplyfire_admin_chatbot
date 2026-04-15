@@ -1,6 +1,6 @@
 import type { Conversation, Message, ConversationStatus } from "@/types/chat";
 
-const MESSAGES_API_BASE_URL = process.env.NEXT_PUBLIC_MESSAGES_API_BASE_URL || "https://simplyfire.ai:5001/api/noilezer/chats";
+const MESSAGES_API_BASE_URL = process.env.NEXT_PUBLIC_MESSAGES_API_BASE_URL || "https://simplyfire.ai/api/noilezer/chats";
 
 export interface ChatsResponse {
   // Newest format: array of objects with { id, data, date } - date is ISO string
