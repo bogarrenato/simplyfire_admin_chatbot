@@ -1,0 +1,42 @@
+name: Build & deploy admin chatbot to Hetzner
+
+on:
+  push:
+    branches: [main]
+
+# Külön concurrency group, így a simplylanding deployjával párhuzamosan is futhat
+# (de egyszerre csak egy admin-chatbot deploy fusson)
+concurrency:
+  group: deploy-admin-chatbot
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, hetzner]
+    env:
+      # A /var/www/simplyfire-admin webroot-ot a szerver setup során hozzuk létre,
+      # ghrunner:www-data tulajdonjoggal, hogy ne kelljen sudo az rsync-hez.
+      WEBROOT: /var/www/simplyfire-admin
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        # A next.config.ts basePath: '/noilezer-admin' miatt a build az out/ mappába
+        # generálja a /noilezer-admin prefix-szel hivatkozott asset-eket.
+        run: npm run build
+
+      - name: Deploy to nginx webroot
+        # --delete: a régi buildből maradt fájlok (pl. törölt chunkok) eltűnnek.
+        # A forrás a Next.js statikus export kimenete: out/
+        run: |
+          rsync -a --delete out/ "$WEBROOT"/
