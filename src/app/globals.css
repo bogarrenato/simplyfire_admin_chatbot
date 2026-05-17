@@ -115,29 +115,6 @@
   --custom-color: oklch(0.6 0.2 150);
 }
 
-/* Calendar range színek CSS változókkal - .rdp-root class alatt kell definiálni */
-.rdp-root {
-  --rdp-range_start-background: oklch(0.646 0.222 41.116 / 0.8);
-  --rdp-range_start-color: oklch(0.145 0 0);
-  --rdp-range_end-background: oklch(0.646 0.222 41.116 / 0.8);
-  --rdp-range_end-color: oklch(0.145 0 0);
-  --rdp-range_middle-background-color: oklch(0.646 0.222 41.116 / 0.3);
-  --rdp-range_middle-color: oklch(0.145 0 0);
-  /* Nav button színek - nincs specifikus CSS változó, ezért az accent-color-t használjuk */
-  --rdp-accent-color: oklch(0.145 0 0);
-}
-
-.dark .rdp-root {
-
-  --rdp-range_start-color: #eeeeef;
-
-  --rdp-range_end-color: #111827;
-  --rdp-range_middle-background-color: #dadaec;
-  --rdp-range_middle-color: #111827;
-  /* Nav button színek sötét témában */
-  --rdp-accent-color: #4b327d;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -147,34 +124,156 @@
   }
 }
 
-/* Calendar styling - mai nap és nyilak színe */
-/* Mai nap fehér sötét témában, sötét világos témában */
-.dark [class*="rdp-day_today"],
-.dark button[class*="rdp-day_today"] {
-  color: white !important;
+/* =========================================================================
+   react-day-picker v9 (9.11.x) — tema-tudatos, lathato range valaszto
+   A v9 CSS valtozoit a hivatalos node_modules/react-day-picker/src/style.css
+   alapjan allitjuk be, az app sajat tema tokenjeire (--primary/--accent/...).
+   Igy automatikusan jol nez ki vilagos ES sotet temaban is (.dark class).
+   ========================================================================= */
+.rdp-root {
+  --rdp-accent-color: var(--primary);
+  --rdp-accent-background-color: color-mix(in oklch, var(--primary) 18%, transparent);
+
+  --rdp-day-width: 2.6rem;
+  --rdp-day-height: 2.6rem;
+  --rdp-day_button-width: 2.4rem;
+  --rdp-day_button-height: 2.4rem;
+  --rdp-day_button-border-radius: 0.55rem;
+
+  /* Range kozepso napok: az --accent / --accent-foreground tervezett
+     kontraszt-par, ami VILAGOS ES SOTET temaban is olvashato marad.
+     (A primary@16% sotetben majdnem feher hatter + feher szoveg volt.) */
+  --rdp-range_middle-background-color: var(--accent);
+  --rdp-range_middle-color: var(--accent-foreground);
+
+  /* Range kezdo nap: tomor primary, lekerekitett bal oldal */
+  --rdp-range_start-color: var(--primary-foreground);
+  --rdp-range_start-date-background-color: var(--primary);
+  --rdp-range_start-background: linear-gradient(
+    var(--rdp-gradient-direction),
+    transparent 50%,
+    var(--rdp-range_middle-background-color) 50%
+  );
+
+  /* Range zaro nap: tomor primary, lekerekitett jobb oldal */
+  --rdp-range_end-color: var(--primary-foreground);
+  --rdp-range_end-date-background-color: var(--primary);
+  --rdp-range_end-background: linear-gradient(
+    var(--rdp-gradient-direction),
+    var(--rdp-range_middle-background-color) 50%,
+    transparent 50%
+  );
+
+  --rdp-today-color: var(--primary);
+  --rdp-selected-border: 2px solid var(--primary);
+  --rdp-outside-opacity: 0.4;
+  --rdp-disabled-opacity: 0.3;
+
+  font-size: 0.9rem;
+  color: var(--foreground);
 }
 
-[class*="rdp-day_today"]:not(.dark),
-button[class*="rdp-day_today"]:not(.dark) {
-  color: oklch(0.145 0 0) !important;
+/* Honap felirat + hetnapok */
+.rdp-month_caption,
+.rdp-caption_label {
+  font-weight: 600;
+  color: var(--foreground);
+  text-transform: capitalize;
+}
+.rdp-weekday {
+  color: color-mix(in oklch, var(--foreground) 55%, transparent);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
 }
 
-/* Nyilak fehér sötét témában, sötét világos témában */
-.dark [class*="rdp-nav_button"],
-.dark [class*="rdp-nav_button"] svg,
-.dark [class*="rdp-nav_button"] path,
-.dark [class*="rdp-nav_button"] * {
-  color: white !important;
-  stroke: white !important;
-  fill: white !important;
+/* Nav gombok (v9: button_previous / button_next) — minden temaban lathato */
+.rdp-button_previous,
+.rdp-button_next {
+  color: var(--foreground);
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease;
+}
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background-color: var(--accent);
+}
+.rdp-chevron {
+  fill: var(--foreground);
+}
+.rdp-button_previous:disabled .rdp-chevron,
+.rdp-button_next:disabled .rdp-chevron {
+  fill: color-mix(in oklch, var(--foreground) 35%, transparent);
 }
 
-[class*="rdp-nav_button"]:not(.dark),
-[class*="rdp-nav_button"]:not(.dark) svg,
-[class*="rdp-nav_button"]:not(.dark) path,
-[class*="rdp-nav_button"]:not(.dark) * {
-  color: oklch(0.145 0 0) !important;
-  stroke: oklch(0.145 0 0) !important;
-  fill: oklch(0.145 0 0) !important;
+/* Napok alap + hover */
+.rdp-day_button {
+  border-radius: var(--rdp-day_button-border-radius);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.rdp-day:not(.rdp-selected):not(.rdp-disabled):hover .rdp-day_button {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* ===========================================================================
+   FONTOS: a react-day-picker/style.css a calendar.tsx-ben importalva van,
+   ezert a globals.css UTAN toltodik be -> azonos specificitasnal a v9 default
+   nyerne. Ezert a kritikus range/today szineket !important-tal kenyszeritjuk,
+   betoltesi sorrendtol fuggetlenul. A szinek tema-tokenekre (--accent /
+   --primary) mutatnak, igy VILAGOS ES SOTET temaban is kontrasztosak.
+   =========================================================================== */
+
+/* MA — jol lathato keret + szin (nincs kivalasztva) */
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  outline: 2px solid color-mix(in oklch, var(--primary) 45%, transparent);
+  outline-offset: -2px;
+}
+
+/* Range KOZEPSO napok: tomor --accent hatter + --accent-foreground szoveg
+   (tervezett kontraszt-par, mindket temaban olvashato) */
+.rdp-range_middle {
+  background-color: var(--accent) !important;
+  background-image: none !important;
+}
+.rdp-range_middle .rdp-day_button {
+  background-color: transparent !important;
+  color: var(--accent-foreground) !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Range KEZDO / ZARO nap: tomor --primary hatter + --primary-foreground szoveg.
+   A v9 default linear-gradient hatteret felulirjuk, hogy ne legyen fel-attetszo. */
+.rdp-range_start,
+.rdp-range_end {
+  background: var(--accent) !important;
+}
+.rdp-range_start .rdp-day_button,
+.rdp-range_end .rdp-day_button {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  font-weight: 700 !important;
+  border: none !important;
+}
+.rdp-range_start .rdp-day_button {
+  border-top-left-radius: 0.55rem !important;
+  border-bottom-left-radius: 0.55rem !important;
+}
+.rdp-range_end .rdp-day_button {
+  border-top-right-radius: 0.55rem !important;
+  border-bottom-right-radius: 0.55rem !important;
+}
+
+/* Egyszeres kivalasztott nap (nem range): tomor primary */
+.rdp-selected:not(.rdp-range_start):not(.rdp-range_middle):not(.rdp-range_end)
+  .rdp-day_button {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  font-weight: 700 !important;
+  border: none !important;
 }
 
